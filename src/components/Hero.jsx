@@ -369,7 +369,7 @@ const Hero = () => {
         </section>
 
         {/* Premium upgrade section */}
-        <section className="mt-20 space-y-6">
+        <section className="space-y-6">
           {/* Premium email capture form with glowing border */}
           <div className="relative">
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 opacity-20 blur-lg rounded-xl"></div>
