@@ -62,8 +62,9 @@ exports.handler = async function(event, context) {
       };
     }
     
-    const { prompt } = requestBody;
-    
+    const { prompt, premium } = requestBody;
+    console.log(prompt)
+    console.log(premium)
     if (!prompt) {
       return {
         statusCode: 400,
@@ -89,12 +90,16 @@ exports.handler = async function(event, context) {
       aspect_ratio: "9:16",
       output_format: "jpg",
       output_quality: 100,
-      disable_safety_checker: true,
-      go_fast: true,
-      megapixels: "0.25"
+    //   disable_safety_checker: true,
+    //   go_fast: true,
+    //   megapixels: "0.25"
     };
 
-    const output = await replicate.run("black-forest-labs/flux-schnell", { input });
+    // const output = await replicate.run("black-forest-labs/flux-schnell", { input });
+    const output = await replicate.run(
+        premium ? "black-forest-labs/flux-1.1-pro" : "black-forest-labs/flux-schnell", 
+        { input }
+      );
 
     // Return the image data
     return {
