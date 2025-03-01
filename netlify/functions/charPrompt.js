@@ -66,6 +66,7 @@ exports.handler = async function (event, context) {
     }
 
     const { prompt } = requestBody;
+    console.log(prompt);
     const systemPrompt = `You are an expert at creating detailed character descriptions for AI image generation that produce photorealistic human portraits. The only input you will receive is {character_name} (e.g., "Lord Voldemort," "Tyrion Lannister," etc.). Based on this single input, you must:
 
 Identify the canonical source (if known or commonly associated).
@@ -102,7 +103,7 @@ Professional photography descriptors and high-resolution rendering terms for max
       messages: [
         {
           role: "system",
-          content: `systemPrompt`,
+          content: systemPrompt,
         },
         { role: "user", content: `${prompt}, [Source or origin if known]. [Approximate age range]. 
 [Detailed face and physical description]. 
