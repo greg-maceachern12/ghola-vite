@@ -41,6 +41,7 @@ const LemonSqueezyPayment = ({ onValidationSuccess }) => {
         if (data.success) {
           setValidationStatus('success');
           setStatusMessage('Request received! We\'ll contact you soon.');
+          window.open("https://maltby.lemonsqueezy.com/buy/dd2174f8-9668-4c2b-98dd-fef1069baaba");
         } else {
           setValidationStatus('error');
           setStatusMessage('Something went wrong. Please try again.');
@@ -213,7 +214,7 @@ const LemonSqueezyPayment = ({ onValidationSuccess }) => {
             {activeTab === 'email' ? (
               <p>We'll send you details for access within 24 hours</p>
             ) : (
-              <p>Enter your license key to unlock premium immediately</p>
+              <p>Enter your license key to unlock premium immediately. <strong>Your license should be in your email.</strong></p>
             )}
           </div>
         </form>
