@@ -263,7 +263,7 @@ const Hero = () => {
       {/* Request Status Indicator - simplified and elegant */}
       <div className="fixed top-0 left-0 right-0 py-3 px-6 backdrop-blur-md bg-black/30 border-b border-white/10 z-20 flex justify-between items-center">
         <div className="flex items-center gap-2 text-lg font-medium">
-          <img src="/assets/ghola-icon.png" alt="Ghola" className="w-6 h-6" />
+          <img src="/assets/icon.png" alt="Ghola" className="w-6 h-6" />
           <span>Ghola</span>
         </div>
         
