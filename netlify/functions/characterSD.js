@@ -87,7 +87,7 @@ exports.handler = async function(event, context) {
     const input = {
       prompt: prompt,
       num_outputs: 1,
-      aspect_ratio: "9:16",
+      aspect_ratio: "3:2",
       output_format: "jpg",
       output_quality: 100,
     //   disable_safety_checker: true,

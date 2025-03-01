@@ -102,3 +102,11 @@
 .animate-spin-slow {
   animation: spin-slow 12s linear infinite;
 }
+
+@keyframes scrollSlow {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-scrollSlow {
+  animation: scrollSlow linear infinite;
+}

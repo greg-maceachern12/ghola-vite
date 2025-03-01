@@ -18,6 +18,7 @@ const CharacterForm = ({ onSubmit, loading }) => {
   const [prompt, setPrompt] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [isHovering, setIsHovering] = useState(false);
   const inputRef = useRef(null);
   
   useEffect(() => {
@@ -51,81 +52,85 @@ const CharacterForm = ({ onSubmit, loading }) => {
     }, 100);
   };
 
-  // Character examples to display as chips
-  const exampleCharacters = ["Harry Potter", "Sherlock Holmes", "Elizabeth Bennet"];
-  
   return (
     <div className="w-full">
-      {/* Example chips */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <span className="text-sm text-white/60">Try:</span>
-        {exampleCharacters.map((example, index) => (
-          <button
-            key={index}
-            onClick={() => {
-              setPrompt(example);
-              setTimeout(() => onSubmit(example), 100);
-            }}
-            className="text-sm px-3 py-1 rounded-full bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
-          >
-            {example}
-          </button>
-        ))}
+      {/* Minimal infinite scrolling text */}
+      <div 
+        className="relative w-full mb-6 overflow-hidden border-b border-white/10 py-1"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+      >
+        <div 
+          className="flex whitespace-nowrap animate-scrollSlow"
+          style={{
+            animationDuration: '20s',
+            animationTimingFunction: 'linear',
+            animationIterationCount: 'infinite',
+            animationPlayState: isHovering ? 'paused' : 'running'
+          }}
+        >
+          {/* Double the suggestions for a seamless infinite scroll */}
+          {[...SUGGESTIONS, ...SUGGESTIONS].map((suggestion, index) => (
+            <button
+              key={index}
+              onClick={() => handleSuggestionClick(suggestion)}
+              className="mx-5 text-sm text-white/60 hover:text-white transition-colors inline-block whitespace-nowrap"
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
       </div>
       
       <form onSubmit={handleSubmit} className="relative">
-        <div className="group transition-all">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-violet-500 opacity-20 rounded-xl blur-sm group-hover:opacity-30 transition-opacity"></div>
+        <div className="relative flex items-center border border-white/20 focus-within:border-white/50 bg-white/5 rounded-md px-3 transition-all">
+          <input
+            ref={inputRef}
+            type="text"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+            placeholder="Enter a character name..."
+            className="w-full py-4 bg-transparent text-white outline-none placeholder:text-white/50 disabled:opacity-50"
+            disabled={loading}
+            aria-label="Character name and source"
+          />
           
-          <div className="relative flex overflow-hidden rounded-xl backdrop-blur-lg bg-white/10 border border-white/20 shadow-lg">
-            <input
-              ref={inputRef}
-              type="text"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-              placeholder="Enter a character name (e.g. Voldemort from Harry Potter)"
-              className="w-full py-4 px-5 bg-transparent text-white outline-none placeholder:text-white/50 disabled:opacity-50"
-              disabled={loading}
-              aria-label="Character name and source"
-            />
-            
-            <button 
-              type="button"
-              onClick={getRandomCharacter}
-              className="px-3 text-white/60 hover:text-white/90 transition-colors"
-              aria-label="Get random character suggestion"
-              title="Random character"
-              disabled={loading}
-            >
-              <FaRandom />
-            </button>
-            
-            <button 
-              type="submit" 
-              className="px-6 bg-white/20 text-white hover:bg-white/30 active:bg-white/40 disabled:opacity-50 transition-colors"
-              disabled={loading}
-              aria-label="Generate character image"
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white/90 rounded-full animate-spin"></div>
-              ) : (
-                <FaSearch />
-              )}
-            </button>
-          </div>
+          <button 
+            type="button"
+            onClick={getRandomCharacter}
+            className="p-2 text-white/50 hover:text-white/90 transition-colors"
+            aria-label="Get random character suggestion"
+            title="Random character"
+            disabled={loading}
+          >
+            <FaRandom />
+          </button>
+          
+          <button 
+            type="submit" 
+            className="ml-1 p-2 px-4 bg-white/10 hover:bg-white/20 text-white rounded-md disabled:opacity-50 transition-colors"
+            disabled={loading}
+            aria-label="Generate character image"
+          >
+            {loading ? (
+              <div className="w-5 h-5 border-t-2 border-white/90 rounded-full animate-spin"></div>
+            ) : (
+              <FaSearch />
+            )}
+          </button>
         </div>
         
         {/* Suggestions dropdown */}
         {isFocused && suggestions.length > 0 && (
-          <div className="absolute left-0 right-0 mt-2 bg-black/50 backdrop-blur-xl rounded-xl border border-white/20 overflow-hidden z-10 shadow-xl">
+          <div className="absolute left-0 right-0 mt-2 bg-black/50 backdrop-blur-md rounded-md border border-white/10 overflow-hidden z-10 shadow-lg">
             <ul>
               {suggestions.map((suggestion, index) => (
                 <li key={index}>
                   <button
                     type="button"
-                    className="block w-full text-left px-4 py-3 text-white hover:bg-white/10 transition-colors"
+                    className="block w-full text-left px-4 py-2 text-white/80 hover:bg-white/10 transition-colors"
                     onClick={() => handleSuggestionClick(suggestion)}
                   >
                     {suggestion}
@@ -139,5 +144,6 @@ const CharacterForm = ({ onSubmit, loading }) => {
     </div>
   );
 };
+
 
 export default CharacterForm;
