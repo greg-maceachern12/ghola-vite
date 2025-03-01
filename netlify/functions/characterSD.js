@@ -88,7 +88,10 @@ exports.handler = async function(event, context) {
       num_outputs: 1,
       aspect_ratio: "9:16",
       output_format: "jpg",
-      output_quality: 100
+      output_quality: 100,
+      disable_safety_checker: true,
+      go_fast: true,
+      megapixels: "0.25"
     };
 
     const output = await replicate.run("black-forest-labs/flux-schnell", { input });

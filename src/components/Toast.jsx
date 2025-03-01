@@ -70,14 +70,6 @@ const Toast = ({ type = 'info', message, duration = 3000 }) => {
             <FaTimes size={12} />
           </button>
         </div>
-        
-        {/* Progress bar - Apple inspired subtle line */}
-        <div className="h-[1px] bg-white/10">
-          <div
-            className="h-full bg-white/30"
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
       </div>
     </div>
   );

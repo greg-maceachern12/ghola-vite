@@ -263,7 +263,7 @@ const Hero = () => {
       {/* Request Status Indicator - simplified and elegant */}
       <div className="fixed top-0 left-0 right-0 py-3 px-6 backdrop-blur-md bg-black/30 border-b border-white/10 z-20 flex justify-between items-center">
         <div className="flex items-center gap-2 text-lg font-medium">
-          <img src="/assets/icon.png" alt="Ghola" className="w-6 h-6" />
+          <img src="/assets/ghola-icon.png" alt="Ghola" className="w-6 h-6" />
           <span>Ghola</span>
         </div>
         
@@ -306,10 +306,7 @@ const Hero = () => {
             )}
             
             {loading && (
-              <div className="mt-8 space-y-2">
-                <div className="w-full h-1 rounded-full overflow-hidden bg-white/10">
-                  <div className="h-full bg-gradient-to-r from-blue-500 to-violet-500 animate-pulse w-3/4"></div>
-                </div>
+              <div className="mt-8">
                 <p className="text-sm text-white/70 italic">This may take up to 20 seconds...</p>
               </div>
             )}
@@ -347,7 +344,7 @@ const Hero = () => {
         <div className="w-full max-w-2xl mx-auto mt-20 mb-12 relative">
           <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 opacity-20 blur-lg rounded-xl"></div>
           
-          <div className="relative bg-black/50 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden">
+          <div className="relative bg-black/70 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden">
             <div className="px-6 py-5">
               <div className="flex flex-col md:flex-row gap-6 items-center">
                 <div className="flex-1">
@@ -433,10 +430,7 @@ const Hero = () => {
                       className="py-2 px-4 bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 rounded-lg text-white font-medium transition-all disabled:opacity-70"
                       disabled={isSubmitting || submitSuccess}
                     >
-                      {isSubmitting ? 
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> :
-                        submitSuccess ? "Sent" : "Get Access"
-                      }
+                      {isSubmitting ? "Sending..." : submitSuccess ? "Sent" : "Get Access"}
                     </button>
                   </form>
                   
