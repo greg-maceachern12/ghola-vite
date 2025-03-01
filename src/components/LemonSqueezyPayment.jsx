@@ -101,7 +101,7 @@ const LemonSqueezyPayment = ({ onValidationSuccess }) => {
               <>
                 <CheckCircle className="w-5 h-5" />
                 <p className="text-sm font-medium">
-                  License validated successfully! Your entire book will be converted.
+                  License validated successfully! You've unlocked Unlimited HD generations
                 </p>
                 <button
                   onClick={() => setValidationStatus(null)}
