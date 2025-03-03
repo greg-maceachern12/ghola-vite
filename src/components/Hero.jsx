@@ -97,6 +97,51 @@ const Hero = () => {
     };
   };
 
+  const handleFeedbackSubmit = async () => {
+    try {
+      const emailValue = document.getElementById('feedbackEmail').value;
+      const messageValue = document.getElementById('feedbackMessage').value;
+      
+      if (!emailValue || !messageValue) {
+        setToast({ type: "error", message: "Please fill in all fields" });
+        setTimeout(() => setToast(null), 3000);
+        return;
+      }
+      
+      setToast({ type: "info", message: "Sending feedback..." });
+      
+      const formData = new FormData();
+      formData.append('access_key', import.meta.env.VITE_WEB3FORMS_KEY);
+      formData.append('email', emailValue);
+      formData.append('message', messageValue);
+      formData.append('subject', 'Ghola User Feedback');
+      formData.append('from_name', 'Ghola Feedback Form');
+      
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setToast({ type: "success", message: "Feedback sent successfully!" });
+        document.getElementById('feedbackEmail').value = '';
+        document.getElementById('feedbackMessage').value = '';
+      } else {
+        throw new Error(data.message || "Failed to send feedback");
+      }
+    } catch (error) {
+      console.error("Error sending feedback:", error);
+      setToast({ 
+        type: "error", 
+        message: error.message || "Failed to send feedback. Please try again."
+      });
+    } finally {
+      setTimeout(() => setToast(null), 3000);
+    }
+  };
+
   const updateRequestsCounter = () => {
     const throttleCheck = checkThrottle();
     const usedRequests = throttleCheck.throttled
@@ -373,6 +418,45 @@ const Hero = () => {
               setPremium(true);
             }}
           />
+        </section>
+        {/* Feedback Form */}
+        <section className="w-full max-w-2xl mx-auto mt-12">
+          <div className="bg-white/5 backdrop-blur-lg p-6 rounded-2xl border border-white/10 shadow-xl">
+            <h3 className="text-xl font-medium mb-4">Contact Us</h3>
+            <div className="space-y-4">
+              <div>
+                <input 
+                  type="email" 
+                  id="feedbackEmail"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Your email address" 
+                />
+              </div>
+              
+              <div>
+                <textarea 
+                  id="feedbackMessage"
+                  rows="2" 
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Questions or feedback? Send a message here"
+                ></textarea>
+              </div>
+              
+              <div>
+              <button 
+                  onClick={handleFeedbackSubmit}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-700 to-grey-500 rounded-lg font-medium text-white hover:opacity-90 transition-opacity"
+                  type="button"
+                >
+                  Send Message
+                </button>
+              </div>
+              
+              <div className="text-xs text-white/50 text-center">
+                Protected by Web3Forms - Your data will never be shared
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </div>

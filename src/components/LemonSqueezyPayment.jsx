@@ -1,89 +1,168 @@
-import React, { useState } from 'react';
-import { CheckCircle, XCircle, Lock, Mail, Zap, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  CheckCircle,
+  XCircle,
+  Lock,
+  Mail,
+  Zap,
+  ArrowRight,
+} from "lucide-react";
 
 const LemonSqueezyPayment = ({ onValidationSuccess }) => {
-  const [inputValue, setInputValue] = useState('');
-  const [activeTab, setActiveTab] = useState('email'); // 'email' or 'license'
+  const [inputValue, setInputValue] = useState("");
+  const [activeTab, setActiveTab] = useState("email"); // 'email' or 'license'
   const [processing, setProcessing] = useState(false);
   const [validationStatus, setValidationStatus] = useState(null); // null, 'validating', 'success', 'error'
   const [isPremium, setIsPremium] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // New state to track initial license check
+
+  // Function to store license key in localStorage
+  const storeLicense = (licenseKey) => {
+    try {
+      localStorage.setItem("ghola_license_key", licenseKey);
+    } catch (error) {
+      console.error("Failed to store license key:", error);
+    }
+  };
+
+  // Function to validate license key against the API
+  const validateLicenseKey = async (licenseKey) => {
+    try {
+      const response = await fetch(
+        "https://api.lemonsqueezy.com/v1/licenses/validate",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            license_key: licenseKey.trim(),
+          }),
+        }
+      );
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("License validation error:", error);
+      return { valid: false, error: "Failed to validate license key" };
+    }
+  };
+
+  // Check for cached license on component mount
+  useEffect(() => {
+    const checkCachedLicense = async () => {
+      try {
+        const cachedLicense = localStorage.getItem("ghola_license_key");
+
+        if (cachedLicense) {
+          setValidationStatus("validating");
+
+          const validationResult = await validateLicenseKey(cachedLicense);
+
+          if (validationResult.valid || validationResult.activated) {
+            setValidationStatus("success");
+            setIsPremium(true);
+            if (onValidationSuccess) {
+              onValidationSuccess({
+                orderTime: new Date().toISOString(),
+                product: "Full Book Conversion",
+                licenseKey: cachedLicense,
+              });
+            }
+          } else {
+            // If cached license is invalid, clear it
+            localStorage.removeItem("ghola_license_key");
+            setValidationStatus(null);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking cached license:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkCachedLicense();
+  }, [onValidationSuccess]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!inputValue.trim()) {
-      setStatusMessage(activeTab === 'email' ? 'Please enter your email' : 'Please enter a license key');
-      setValidationStatus('error');
+      setStatusMessage(
+        activeTab === "email"
+          ? "Please enter your email"
+          : "Please enter a license key"
+      );
+      setValidationStatus("error");
       return;
     }
 
     setProcessing(true);
-    setValidationStatus('validating');
-    setStatusMessage('');
+    setValidationStatus("validating");
+    setStatusMessage("");
 
-    if (activeTab === 'email') {
+    if (activeTab === "email") {
       // Handle email signup
       try {
         const formData = new FormData();
-        formData.append('access_key', import.meta.env.VITE_WEB3FORMS_KEY);
-        formData.append('email', inputValue);
-        formData.append('subject', 'New Premium Access Request');
-        formData.append('from_name', 'Ghola Premium Request');
+        formData.append("access_key", import.meta.env.VITE_WEB3FORMS_KEY);
+        formData.append("email", inputValue);
+        formData.append("subject", "New Premium Access Request");
+        formData.append("from_name", "Ghola Premium Request");
 
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          body: formData
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          body: formData,
         });
 
         const data = await response.json();
 
         if (data.success) {
-          setValidationStatus('success');
-          setStatusMessage('Request received! We\'ll contact you soon.');
-          window.open("https://maltby.lemonsqueezy.com/buy/dd2174f8-9668-4c2b-98dd-fef1069baaba");
+          setValidationStatus("success");
+          setStatusMessage("Request received! We'll contact you soon.");
+          window.open(
+            "https://maltby.lemonsqueezy.com/buy/dd2174f8-9668-4c2b-98dd-fef1069baaba"
+          );
         } else {
-          setValidationStatus('error');
-          setStatusMessage('Something went wrong. Please try again.');
+          setValidationStatus("error");
+          setStatusMessage("Something went wrong. Please try again.");
         }
       } catch (error) {
-        setValidationStatus('error');
-        setStatusMessage('Failed to submit. Please try again later.');
+        setValidationStatus("error");
+        setStatusMessage("Failed to submit. Please try again later.");
       }
     } else {
       // Handle license key validation
       try {
-        const response = await fetch('https://api.lemonsqueezy.com/v1/licenses/validate', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            license_key: inputValue.trim()
-          })
-        });
+        const validationResult = await validateLicenseKey(inputValue);
 
-        const data = await response.json();
+        if (validationResult.activated || validationResult.valid) {
+          // Store valid license in localStorage for future visits
+          storeLicense(inputValue.trim());
 
-        if (data.activated || data.valid) {
-          setValidationStatus('success');
+          setValidationStatus("success");
           setIsPremium(true);
-          setStatusMessage('License validated successfully! You\'ve unlocked Unlimited HD generations');
+          setStatusMessage(
+            "License validated successfully! You've unlocked Unlimited HD generations"
+          );
           if (onValidationSuccess) {
             onValidationSuccess({
               orderTime: new Date().toISOString(),
-              product: 'Full Book Conversion',
+              product: "Full Book Conversion",
               licenseKey: inputValue,
             });
           }
         } else {
-          setValidationStatus('error');
-          setStatusMessage(data.error || 'Invalid license key');
+          setValidationStatus("error");
+          setStatusMessage(validationResult.error || "Invalid license key");
         }
       } catch (error) {
-        setValidationStatus('error');
-        setStatusMessage('Failed to validate license key. Please try again.');
+        setValidationStatus("error");
+        setStatusMessage("Failed to validate license key. Please try again.");
       }
     }
 
@@ -91,10 +170,21 @@ const LemonSqueezyPayment = ({ onValidationSuccess }) => {
   };
 
   const resetForm = () => {
-    setInputValue('');
+    setInputValue("");
     setValidationStatus(null);
-    setStatusMessage('');
+    setStatusMessage("");
   };
+
+  // Show loading state while checking cached license
+  if (isLoading) {
+    return (
+      <div className="bg-black/50 backdrop-blur-lg border border-white/20 rounded-xl p-5">
+        <div className="flex items-center justify-center py-2">
+          <div className="animate-spin h-5 w-5 border-2 border-white/30 border-t-white rounded-full" />
+        </div>
+      </div>
+    );
+  }
 
   // If premium is already active, show a simple success message
   if (isPremium) {
@@ -116,12 +206,12 @@ const LemonSqueezyPayment = ({ onValidationSuccess }) => {
       <div className="flex border-b border-white/10">
         <button
           className={`flex-1 py-3 text-sm font-medium transition-colors ${
-            activeTab === 'email' 
-              ? 'text-white border-b-2 border-blue-400' 
-              : 'text-white/60 hover:text-white/80'
+            activeTab === "email"
+              ? "text-white border-b-2 border-blue-400"
+              : "text-white/60 hover:text-white/80"
           }`}
           onClick={() => {
-            setActiveTab('email');
+            setActiveTab("email");
             resetForm();
           }}
         >
@@ -132,12 +222,12 @@ const LemonSqueezyPayment = ({ onValidationSuccess }) => {
         </button>
         <button
           className={`flex-1 py-3 text-sm font-medium transition-colors ${
-            activeTab === 'license' 
-              ? 'text-white border-b-2 border-blue-400' 
-              : 'text-white/60 hover:text-white/80'
+            activeTab === "license"
+              ? "text-white border-b-2 border-blue-400"
+              : "text-white/60 hover:text-white/80"
           }`}
           onClick={() => {
-            setActiveTab('license');
+            setActiveTab("license");
             resetForm();
           }}
         >
@@ -171,17 +261,19 @@ const LemonSqueezyPayment = ({ onValidationSuccess }) => {
         <form onSubmit={handleSubmit}>
           <div className="relative">
             <input
-              type={activeTab === 'email' ? 'email' : 'text'}
+              type={activeTab === "email" ? "email" : "text"}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={activeTab === 'email' ? 'your@email.com' : 'Enter license key'}
+              placeholder={
+                activeTab === "email" ? "your@email.com" : "Enter license key"
+              }
               className="w-full py-3 px-3 pr-12 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40"
               disabled={processing}
             />
             <button
               type="submit"
               disabled={processing}
-              className="absolute right-1 top-1 h-8 w-8 flex items-center justify-center bg-blue-500 hover:bg-blue-600 rounded-md text-white transition-colors"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center bg-blue-700 hover:bg-blue-600 rounded-md text-white transition-colors"
             >
               {processing ? (
                 <div className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
@@ -192,14 +284,16 @@ const LemonSqueezyPayment = ({ onValidationSuccess }) => {
           </div>
 
           {/* Status message */}
-          {validationStatus && validationStatus !== 'validating' && (
-            <div className={`mt-3 p-2 text-sm rounded-md ${
-              validationStatus === 'success'
-                ? 'bg-green-500/20 text-green-400'
-                : 'bg-red-500/20 text-red-400'
-            }`}>
+          {validationStatus && validationStatus !== "validating" && (
+            <div
+              className={`mt-3 p-2 text-sm rounded-md ${
+                validationStatus === "success"
+                  ? "bg-green-500/20 text-green-400"
+                  : "bg-red-500/20 text-red-400"
+              }`}
+            >
               <div className="flex items-center gap-2">
-                {validationStatus === 'success' ? (
+                {validationStatus === "success" ? (
                   <CheckCircle className="w-4 h-4 shrink-0" />
                 ) : (
                   <XCircle className="w-4 h-4 shrink-0" />
@@ -211,10 +305,13 @@ const LemonSqueezyPayment = ({ onValidationSuccess }) => {
 
           {/* Additional message based on active tab */}
           <div className="mt-3 text-center text-xs text-white/50">
-            {activeTab === 'email' ? (
+            {activeTab === "email" ? (
               <p>We'll send you details for access within 24 hours</p>
             ) : (
-              <p>Enter your license key to unlock premium immediately. <strong>Your license should be in your email.</strong></p>
+              <p>
+                Enter your license key to unlock premium immediately.{" "}
+                <strong>Your license should be in your email.</strong>
+              </p>
             )}
           </div>
         </form>

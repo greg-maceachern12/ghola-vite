@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaRandom } from 'react-icons/fa';
 
 const SUGGESTIONS = [
-  "Gandalf from Lord of the Rings",
+  "Gojo from JJK",
   "Arya Stark from Game of Thrones",
   "Sherlock Holmes from Sherlock Holmes",
   "Elizabeth Bennet from Pride and Prejudice",
@@ -33,7 +33,7 @@ const CharacterForm = ({ onSubmit, loading }) => {
     }
   }, [prompt]);
   
-  const handleSubmit = (e) => {
+  const handleSubmit = (e) => {ç
     e.preventDefault();
     onSubmit(prompt.trim());
   };
