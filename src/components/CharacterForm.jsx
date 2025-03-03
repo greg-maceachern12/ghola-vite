@@ -2,16 +2,16 @@ import { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaRandom } from 'react-icons/fa';
 
 const SUGGESTIONS = [
-  "Gojo from JJK",
-  "Arya Stark from Game of Thrones",
-  "Sherlock Holmes from Sherlock Holmes",
-  "Elizabeth Bennet from Pride and Prejudice",
-  "Count Dracula from Dracula",
-  "Wednesday Addams from The Addams Family",
-  "Captain Ahab from Moby Dick",
-  "Tyrion Lannister from Game of Thrones", 
-  "Alice from Alice in Wonderland",
-  "Matilda from Matilda"
+  "Gojo Satoru from JJK",
+  "Holden Caulfield from The Catcher in the Rye",
+  "Scout Finch from To Kill a Mockingbird",
+  "Gatsby from The Great Gatsby",
+  "Matilda from Matilda",
+  "Jonas from The Giver",
+  "Percy Jackson from Percy Jackson & The Olympians",
+  "Hazel Grace Lancaster from The Fault in Our Stars",
+  "Auggie Pullman from Wonder",
+  "Charlie from The Perks of Being a Wallflower"
 ];
 
 const CharacterForm = ({ onSubmit, loading }) => {
@@ -63,7 +63,7 @@ const CharacterForm = ({ onSubmit, loading }) => {
         <div 
           className="flex whitespace-nowrap animate-scrollSlow"
           style={{
-            animationDuration: '20s',
+            animationDuration: '15s',
             animationTimingFunction: 'linear',
             animationIterationCount: 'infinite',
             animationPlayState: isHovering ? 'paused' : 'running'

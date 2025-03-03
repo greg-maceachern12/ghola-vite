@@ -89,7 +89,12 @@ const GeneratedImage = ({ src, alt, character, premium }) => {
               {premium ? (
                 <span className="text-blue-600 font-bold">Flux Pro</span>
               ) : (
-                "Flux Schnell"
+                <>
+                  Flux Schnell{" "}
+                  <a href="https://maltby.lemonsqueezy.com/buy/dd2174f8-9668-4c2b-98dd-fef1069baaba" target="_blank" className="text-blue-500 underline">
+                    click here for unlimited HD generations
+                  </a>
+                </>
               )}{" "}
               model
             </span>
