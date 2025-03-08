@@ -3,7 +3,6 @@ import CharacterForm from "./CharacterForm";
 import GeneratedImage from "./GeneratedImage";
 import Toast from "./Toast";
 import LemonSqueezyPayment from "./LemonSqueezyPayment";
-import { FaCoffee } from "react-icons/fa";
 
 const Hero = () => {
   const [loading, setLoading] = useState(false);
@@ -19,11 +18,13 @@ const Hero = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [premium, setPremium] = useState(false); // Tracks if premium license has been validated
+  const [aspectRatio, setAspectRatio] = useState("landscape"); // Default aspect ratio
+  const [imageStyle, setImageStyle] = useState("default"); // Default style
 
   const resultRef = useRef(null);
 
   // Throttling configuration (only used for non-premium users)
-  const THROTTLE_WINDOW = 5 * 60 * 1000; // 5 minutes in ms
+  const THROTTLE_WINDOW = 24 * 60 * 60 * 1000; // 24 hours (1 day) in ms
   const MAX_REQUESTS = 5;
   const THROTTLE_STORAGE_KEY = "ghola_request_timestamps";
 
@@ -155,12 +156,16 @@ const Hero = () => {
     }
   };
 
-  const handleCharacterFormSubmit = async (prompt) => {
+  const handleCharacterFormSubmit = async (prompt, selectedAspectRatio = "landscape", selectedStyle = "default") => {
     if (!prompt) {
       setToast({ type: "error", message: "Please enter a character name" });
       setTimeout(() => setToast(null), 3000);
       return;
     }
+
+    // Update the aspect ratio and style
+    setAspectRatio(selectedAspectRatio);
+    setImageStyle(selectedStyle);
 
     if (!premium) {
       const throttleCheck = checkThrottle();
@@ -200,11 +205,16 @@ const Hero = () => {
       }
 
       setToast({ type: "info", message: "Creating character image..." });
-      // Include the premium flag in the request payload
+      // Include the premium flag, aspect ratio, and style in the request payload
       const imageResponse = await fetch("/.netlify/functions/characterSD", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: promptData.response, premium }),
+        body: JSON.stringify({ 
+          prompt: promptData.response, 
+          premium, 
+          aspect_ratio: selectedAspectRatio,
+          style: selectedStyle
+        }),
       });
 
       if (!imageResponse.ok) {
@@ -270,6 +280,16 @@ const Hero = () => {
         </span>
       </div>
     );
+  };
+
+  const handleTryExampleClick = (characterName) => {
+    if (characterName) {
+      setTimeout(() => {
+        handleCharacterFormSubmit(characterName);
+      }, 100);
+    }
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -339,7 +359,7 @@ const Hero = () => {
             <span className="font-light">to life</span>
           </h1>
           <h2 className="text-xl md:text-2xl text-white/80 font-light">
-            From pages to pixels: Your favorite book characters, visualized
+            Enter any character, real or fictional, and generate an AI portrait
           </h2>
         </div>
 
@@ -349,6 +369,7 @@ const Hero = () => {
             onSubmit={handleCharacterFormSubmit}
             loading={loading}
             animated={false}
+            premium={premium}
           />
 
           {error && (
@@ -414,7 +435,6 @@ const Hero = () => {
         <section className="w-full max-w-3xl mx-auto">
           <LemonSqueezyPayment
             onValidationSuccess={(details) => {
-              console.log("License validated:", details);
               setPremium(true);
             }}
           />

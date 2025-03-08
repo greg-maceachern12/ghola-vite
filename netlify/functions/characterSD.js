@@ -62,9 +62,12 @@ exports.handler = async function(event, context) {
       };
     }
     
-    const { prompt, premium } = requestBody;
-    console.log(prompt)
-    console.log(premium)
+    let { prompt, premium, aspect_ratio = "landscape", style = "default" } = requestBody;
+    console.log("Prompt:", prompt);
+    console.log("Premium:", premium);
+    console.log("Aspect ratio:", aspect_ratio);
+    console.log("Style:", style);
+    
     if (!prompt) {
       return {
         statusCode: 400,
@@ -81,25 +84,63 @@ exports.handler = async function(event, context) {
       auth: API_KEY,
     });
     
-    console.log("Processing prompt:", prompt);
+    // Map the aspect_ratio parameter to actual ratios
+    let aspectRatioValue;
+    switch(aspect_ratio) {
+      case "square":
+        aspectRatioValue = "1:1";
+        break;
+      case "portrait": 
+        aspectRatioValue = "2:3";
+        break;
+      case "landscape":
+      default:
+        aspectRatioValue = "3:2";
+        break;
+    }
+    
+    // Determine which model to use based on premium status
+    let modelVersion;
+    
+    if (premium) {
+      // Premium users get the flux-1.1-pro model only
+      modelVersion = "black-forest-labs/flux-1.1-pro";
+      
+      // We'll handle different styles by modifying the prompt
+      let stylePrefix = "";
+      
+      if (style === "anime") {
+        stylePrefix = "anime style, manga art, ";
+      } else if (style === "artistic") {
+        stylePrefix = "artistic painting, painterly style, ";
+      } else if (style === "claymation") {
+        stylePrefix = "claymation style, 3D clay model, ";
+      }
+      
+      // Prepend the style prefix to the prompt
+      if (stylePrefix) {
+        prompt = stylePrefix + prompt;
+      }
+    } else {
+      // Non-premium users always get the basic model
+      modelVersion = "black-forest-labs/flux-schnell";
+    }
+    
+    console.log("Using model:", modelVersion);
+    console.log("Final prompt:", prompt);
     
     // Call Replicate API
     const input = {
       prompt: prompt,
       num_outputs: 1,
-      aspect_ratio: "3:2",
+      aspect_ratio: aspectRatioValue,
       output_format: "jpg",
       output_quality: 100,
-    //   disable_safety_checker: true,
-    //   go_fast: true,
-    //   megapixels: "0.25"
+      seed: 17329,
+      safety_tolerance: 6,
     };
 
-    // const output = await replicate.run("black-forest-labs/flux-schnell", { input });
-    const output = await replicate.run(
-        premium ? "black-forest-labs/flux-1.1-pro" : "black-forest-labs/flux-schnell", 
-        { input }
-      );
+    const output = await replicate.run(modelVersion, { input });
 
     // Return the image data
     return {
