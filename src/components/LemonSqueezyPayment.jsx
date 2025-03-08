@@ -76,10 +76,10 @@ const PremiumAccessManager = ({ onValidationSuccess }) => {
       const response = await polar.subscriptions.list({
         product_id: PRODUCT_ID
       });
-      console.log(response)
+      // console.log(response)
       // Process the response which comes in the format you showed
       const subscriptions = response?.result?.items || [];
-      console.log(subscriptions);
+      // console.log(subscriptions);
       // Find active subscriptions for our product ID
       const activeSubscription = subscriptions.find(sub => 
         (sub.status === "active" || sub.status === "trialing") && 
