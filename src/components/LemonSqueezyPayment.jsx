@@ -188,7 +188,7 @@ const PremiumAccessManager = ({ onValidationSuccess }) => {
       <div className="border-b border-white/10 py-3">
         <div className="flex items-center justify-center gap-2">
           <CreditCard className="w-4 h-4 text-blue-400" />
-          <h2 className="text-sm font-medium text-white">Premium Subscription</h2>
+          <h2 className="text-sm font-medium text-white">Premium</h2>
         </div>
       </div>
 
