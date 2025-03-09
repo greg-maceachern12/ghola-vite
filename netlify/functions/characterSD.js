@@ -138,6 +138,8 @@ exports.handler = async function(event, context) {
       output_quality: 100,
       seed: 17329,
       safety_tolerance: 6,
+      prompt_upsampling: true,
+      disable_safety_checker: false,
     };
 
     const output = await replicate.run(modelVersion, { input });

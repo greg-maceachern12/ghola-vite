@@ -74,8 +74,10 @@ const GeneratedImage = ({ src, alt, character, premium }) => {
         {/* Character name overlay */}
         {character && isLoaded && (
           <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
-            <FaCrown className="text-yellow-500 ml-1 text-xs" />
-            <h3 className="text-white text-xl font-medium">{character}</h3>
+            <div className="flex items-center">
+              {premium && <FaCrown className="text-yellow-500 mr-2 text-xs" />}
+              <h3 className="text-white text-xl font-medium">{character}</h3>
+            </div>
           </div>
         )}
       </div>
@@ -92,7 +94,11 @@ const GeneratedImage = ({ src, alt, character, premium }) => {
               ) : (
                 <>
                   Flux Schnell{" "}
-                  <a href="https://maltby.lemonsqueezy.com/buy/dd2174f8-9668-4c2b-98dd-fef1069baaba" target="_blank" className="text-blue-500 underline">
+                  <a
+                    href="https://maltby.lemonsqueezy.com/buy/dd2174f8-9668-4c2b-98dd-fef1069baaba"
+                    target="_blank"
+                    className="text-blue-500 underline"
+                  >
                     click here for unlimited HD generations
                   </a>
                 </>

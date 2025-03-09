@@ -63,7 +63,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [isHovering, setIsHovering] = useState(false);
-  const [aspectRatio, setAspectRatio] = useState("landscape");
+  const [aspectRatio, setAspectRatio] = useState("portrait");
   const [style, setStyle] = useState("default");
   const [showStyleMenu, setShowStyleMenu] = useState(false);
   const [showPremiumTooltip, setShowPremiumTooltip] = useState(false);
@@ -253,6 +253,19 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
           <div className="flex gap-4">
             <button
               type="button"
+              onClick={() => setAspectRatio("portrait")}
+              className={`flex items-center gap-2 text-sm ${
+                aspectRatio === "portrait"
+                  ? "text-blue-400 font-medium"
+                  : "text-white/50 hover:text-white/80"
+              } transition-colors`}
+              title="Portrait (2:3)"
+            >
+              <BiRectangle className="text-lg" />
+              <span>Portrait</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setAspectRatio("landscape")}
               className={`flex items-center gap-2 text-sm ${
                 aspectRatio === "landscape"
@@ -277,20 +290,6 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
             >
               <BsSquareFill className="text-base" />
               <span>Square</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setAspectRatio("portrait")}
-              className={`flex items-center gap-2 text-sm ${
-                aspectRatio === "portrait"
-                  ? "text-blue-400 font-medium"
-                  : "text-white/50 hover:text-white/80"
-              } transition-colors`}
-              title="Portrait (2:3)"
-            >
-              <BiRectangle className="text-lg" />
-              <span>Portrait</span>
             </button>
           </div>
 

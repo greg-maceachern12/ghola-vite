@@ -3,6 +3,7 @@ import CharacterForm from "./CharacterForm";
 import GeneratedImage from "./GeneratedImage";
 import Toast from "./Toast";
 import LemonSqueezyPayment from "./LemonSqueezyPayment";
+import PremiumUpsell from "./PremiumUpsell";
 
 const Hero = () => {
   const [loading, setLoading] = useState(false);
@@ -14,12 +15,12 @@ const Hero = () => {
   const [throttled, setThrottled] = useState(false);
   const [resetTime, setResetTime] = useState(0);
   const [toast, setToast] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState("");
   const [premium, setPremium] = useState(false); // Tracks if premium license has been validated
-  const [aspectRatio, setAspectRatio] = useState("landscape"); // Default aspect ratio
-  const [imageStyle, setImageStyle] = useState("default"); // Default style
+  const [showUpsell, setShowUpsell] = useState(false); // State to control the upsell dialog visibility
+  const [upsellShownThisSession, setUpsellShownThisSession] = useState(false); // Track if upsell has been shown this session
+  const [isFirstImageGeneration, setIsFirstImageGeneration] = useState(true); // Track if this is the first image generation
+  // const [aspectRatio, setAspectRatio] = useState("landscape"); // Default aspect ratio
+  // const [imageStyle, setImageStyle] = useState("default"); // Default style
 
   const resultRef = useRef(null);
 
@@ -164,8 +165,8 @@ const Hero = () => {
     }
 
     // Update the aspect ratio and style
-    setAspectRatio(selectedAspectRatio);
-    setImageStyle(selectedStyle);
+    // setAspectRatio(selectedAspectRatio);
+    // setImageStyle(selectedStyle);
 
     if (!premium) {
       const throttleCheck = checkThrottle();
@@ -230,6 +231,19 @@ const Hero = () => {
         type: "success",
         message: "Character generated successfully!",
       });
+
+      // Show upsell after the first image generation if user is not premium
+      // and upsell hasn't been shown yet in this session
+      if (!premium && isFirstImageGeneration && !upsellShownThisSession) {
+        setShowUpsell(true);
+        setUpsellShownThisSession(true);
+      }
+      
+      // Set first image generation to false after first successful generation
+      if (isFirstImageGeneration) {
+        setIsFirstImageGeneration(false);
+      }
+
       setTimeout(() => {
         if (resultRef.current) {
           resultRef.current.scrollIntoView({
@@ -479,6 +493,16 @@ const Hero = () => {
           </div>
         </section>
       </main>
+
+      {/* Premium upsell dialog */}
+      {showUpsell && (
+        <PremiumUpsell 
+          onClose={() => setShowUpsell(false)}
+          firstImageUrl={generatedImage}
+          remainingRequests={maxRequests - requestsUsed}
+          maxRequests={maxRequests}
+        />
+      )}
     </div>
   );
 };
