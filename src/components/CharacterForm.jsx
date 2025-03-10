@@ -209,7 +209,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
       </div>
 
       <form onSubmit={handleSubmit} className="relative">
-        <div className="relative flex items-center border border-white/20 focus-within:border-white/50 bg-white/5 rounded-md px-3 transition-all">
+        <div className={`relative flex items-center border ${premium ? 'border-green-400/20 focus-within:border-green-400/40' : 'border-white/20 focus-within:border-white/50'} bg-white/5 rounded-md px-3 transition-all ${premium ? 'shadow-[0_0_10px_rgba(74,222,128,0.05)]' : ''}`}>
           <input
             ref={inputRef}
             type="text"

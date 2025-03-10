@@ -95,7 +95,7 @@ const GeneratedImage = ({ src, alt, character, premium }) => {
                 <>
                   Flux Schnell{" "}
                   <a
-                    href="https://maltby.lemonsqueezy.com/buy/dd2174f8-9668-4c2b-98dd-fef1069baaba"
+                    href="https://buy.polar.sh/polar_cl_ukvMp9Z1bIr9IrqDv9Y0Zs80WtqXf9gFLLkUH1Gd0B3"
                     target="_blank"
                     className="text-blue-500 underline"
                   >

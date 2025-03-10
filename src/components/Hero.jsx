@@ -272,13 +272,28 @@ const Hero = () => {
     if (premium) {
       return (
         <div className="flex items-center gap-2 text-sm text-green-400">
-          <span>Premium Active – Unlimited Generations</span>
+          <svg
+            className="w-3.5 h-3.5 mr-1"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 12L11 14L15 10M12 3L4 10V20H20V10L12 3Z"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span>Premium Active</span>
         </div>
       );
     }
+    
     const remaining = maxRequests - requestsUsed;
     return (
-      <div className="flex items-center gap-2 text-sm text-white/80">
+      <div className="flex items-center gap-2 text-sm">
         <div className="flex items-center gap-1">
           {[...Array(maxRequests)].map((_, i) => (
             <div
@@ -289,8 +304,8 @@ const Hero = () => {
             ></div>
           ))}
         </div>
-        <span>
-          {remaining}/{maxRequests} images remaining
+        <span className="text-white/80">
+          {remaining}/{maxRequests} images
         </span>
       </div>
     );
@@ -345,11 +360,11 @@ const Hero = () => {
                   strokeLinejoin="round"
                 />
               </svg>
-              Premium Active – Unlimited HD Generations
+              Premium Active
             </span>
           </div>
         ) : throttled ? (
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex flex-col sm:flex-row items-center gap-2 text-sm">
             <span className="text-amber-300">Rate limit reached</span>
             <span className="bg-white/10 px-2 py-1 rounded-full text-xs">
               Try again in {Math.floor(resetTime / 60)}:
@@ -362,7 +377,36 @@ const Hero = () => {
       </header>
 
       {/* Main content with vertical flow */}
-      <main className="container mx-auto max-w-screen-xl px-4 pt-32 pb-16 flex flex-col items-center">
+      <main className="container mx-auto max-w-screen-xl px-4 pt-28 pb-16 flex flex-col items-center">
+        {/* Premium Upgrade Banner - only shown for non-premium users */}
+        {!premium && (
+          <div className="w-full max-w-3xl mb-6 bg-gradient-to-r from-blue-900/70 to-indigo-900/70 backdrop-blur-sm rounded-lg p-2 border border-blue-700/30 shadow-md">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="bg-blue-500/20 p-1.5 rounded-full mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <p className="text-blue-100 text-xs">
+                  <span className="font-medium">Upgrade to Premium</span>
+                  <span className="hidden sm:inline"> - Unlimited HD generations</span>
+                </p>
+              </div>
+              <a 
+                href="https://buy.polar.sh/polar_cl_ukvMp9Z1bIr9IrqDv9Y0Zs80WtqXf9gFLLkUH1Gd0B3"
+                target="_blank"
+                className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium py-1 px-3 rounded transition-colors flex items-center"
+              >
+                Upgrade
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        )}
+        
         {/* Large Hero Header */}
         <div className="text-center mb-12 max-w-3xl">
           <h1 className="text-5xl md:text-7xl font-bold leading-tight tracking-tight text-white mb-6">

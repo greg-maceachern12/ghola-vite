@@ -92,7 +92,7 @@ const PremiumUpsell = ({
             </div>
 
             <a
-              href="https://maltby.lemonsqueezy.com/buy/dd2174f8-9668-4c2b-98dd-fef1069baaba"
+              href="https://buy.polar.sh/polar_cl_ukvMp9Z1bIr9IrqDv9Y0Zs80WtqXf9gFLLkUH1Gd0B3"
               target="_blank"
               className="flex items-center justify-center w-full bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 text-white font-medium py-3 px-4 rounded-lg transition duration-150 shadow-lg"
             >
