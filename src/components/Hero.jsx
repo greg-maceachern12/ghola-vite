@@ -380,7 +380,7 @@ const Hero = () => {
       <main className="container mx-auto max-w-screen-xl px-4 pt-28 pb-16 flex flex-col items-center">
         {/* Premium Upgrade Banner - only shown for non-premium users */}
         {!premium && (
-          <div className="w-full max-w-3xl mb-6 bg-gradient-to-r from-blue-900/70 to-indigo-900/70 backdrop-blur-sm rounded-lg p-2 border border-blue-700/30 shadow-md">
+          <div className="w-full max-w-3xl mb-6 bg-gradient-to-r from-blue-900/50 to-indigo-900/70 backdrop-blur-sm rounded-lg p-2 border border-blue-700/30 shadow-md">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="bg-blue-500/20 p-1.5 rounded-full mr-2">
@@ -490,7 +490,7 @@ const Hero = () => {
         </section>
 
         {/* Premium upgrade section */}
-        <section className="w-full max-w-3xl mx-auto">
+        <section id="premium-upgrade" className="w-full max-w-3xl mx-auto">
           <LemonSqueezyPayment
             onValidationSuccess={(details) => {
               setPremium(true);
