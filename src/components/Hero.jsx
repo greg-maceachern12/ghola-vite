@@ -339,7 +339,7 @@ const Hero = () => {
       {/* Header with status indicators */}
       <header className="fixed top-0 left-0 right-0 py-4 px-6 backdrop-blur-md bg-black/40 border-b border-white/10 z-20 flex justify-between items-center">
         <div className="flex items-center gap-3 text-xl font-medium">
-          <img src="/assets/icon.png" alt="Ghola" className="w-7 h-7" />
+          <img src="/assets/logo3_trans.png" alt="Ghola" className="w-7 h-7" />
           <span>Ghola</span>
         </div>
 
