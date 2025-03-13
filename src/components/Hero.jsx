@@ -393,16 +393,15 @@ const Hero = () => {
                   <span className="hidden sm:inline"> - Unlimited HD generations</span>
                 </p>
               </div>
-              <a 
-                href="https://buy.polar.sh/polar_cl_ukvMp9Z1bIr9IrqDv9Y0Zs80WtqXf9gFLLkUH1Gd0B3"
-                target="_blank"
+              <button 
+                onClick={() => setShowUpsell(true)}
                 className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium py-1 px-3 rounded transition-colors flex items-center"
               >
                 Upgrade
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-              </a>
+              </button>
             </div>
           </div>
         )}
