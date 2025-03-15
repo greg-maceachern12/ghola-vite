@@ -20,6 +20,12 @@ export const EXAMPLE_IMAGES = [
     style: "realistic",
   },
   {
+    src: "/assets/examples/mark.png",
+    alt: "Mark Grayson",
+    character: "Mark Grayson",
+    style: "realistic",
+  },
+  {
     src: "/assets/examples/artemis.jpeg",
     alt: "Artemis Fowl",
     character: "Artemis Fowl",
