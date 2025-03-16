@@ -120,11 +120,7 @@ Professional photography descriptors and high-resolution rendering terms for max
           role: "system",
           content: `${systemPrompt} ${aspectRatioGuidance}`,
         },
-        { role: "user", content: `${prompt}, [Source or origin if known]. [Approximate age range]. 
-[Detailed face and physical description]. 
-[Authentic clothing and accessories]. 
-[Appropriate environment or background]. 
-[Natural pose and expression]. 
+        { role: "user", content: `${prompt}
 Portrait photography, photorealistic, natural lighting, cinematic quality, 
 detailed skin texture, professional photography, 8k, highly detailed human features, 
 portrait shot, 85mm lens, shallow depth of field, subsurface scattering.` },

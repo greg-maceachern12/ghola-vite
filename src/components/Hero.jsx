@@ -214,7 +214,8 @@ const Hero = () => {
           prompt: promptData.response, 
           premium, 
           aspect_ratio: selectedAspectRatio,
-          style: selectedStyle
+          style: selectedStyle,
+          character: prompt
         }),
       });
 
