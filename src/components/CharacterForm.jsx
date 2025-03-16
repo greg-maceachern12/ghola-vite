@@ -70,7 +70,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [isHovering, setIsHovering] = useState(false);
   const [aspectRatio, setAspectRatio] = useState("portrait");
-  const [style, setStyle] = useState("default");
+  const [style, setStyle] = useState("realistic");
   const [showStyleMenu, setShowStyleMenu] = useState(false);
   const [showPremiumTooltip, setShowPremiumTooltip] = useState(false);
   const inputRef = useRef(null);
@@ -144,7 +144,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
       onSubmit(
         example.character,
         example.aspectRatio,
-        premium ? example.style : "default"
+        premium ? example.style : "realistic"
       );
     }, 100);
   };
@@ -179,8 +179,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   alt={example.alt}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
-                {example.style !== "default" &&
-                  example.style !== "realistic" &&
+                {example.style !== "realistic" &&
                   !premium && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                       <FaLock className="text-white/80 text-lg" />
@@ -197,14 +196,13 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   } flex items-center gap-1`}
                 >
                   {!premium &&
-                    example.style !== "default" &&
+                    example.style !== "realistic" &&
                     example.style !== "realistic" && (
                       <FaLock className="text-[10px]" />
                     )}
-                  {example.style === "default" ? "realistic" : example.style}
+                  {example.style === "realistic" ? "realistic" : example.style}
                 </span>
                 {premium &&
-                  example.style !== "default" &&
                   example.style !== "realistic" && (
                     <FaCrown className="text-yellow-500 ml-1 text-xs" />
                   )}
@@ -311,7 +309,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
             >
               <FaPalette />
               <span>
-                {style === "default"
+                {style === "realistic"
                   ? "Realistic"
                   : style.charAt(0).toUpperCase() + style.slice(1)}
               </span>
@@ -332,9 +330,9 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   <li>
                     <button
                       type="button"
-                      onClick={() => handleStyleSelect("default")}
+                      onClick={() => handleStyleSelect("realistic")}
                       className={`block w-full text-left px-4 py-2 text-sm ${
-                        style === "default"
+                        style === "realistic"
                           ? "bg-blue-500/20 text-blue-400"
                           : "hover:bg-white/5"
                       } ${!premium && "opacity-70"}`}

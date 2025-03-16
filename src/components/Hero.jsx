@@ -157,7 +157,7 @@ const Hero = () => {
     }
   };
 
-  const handleCharacterFormSubmit = async (prompt, selectedAspectRatio = "landscape", selectedStyle = "default") => {
+  const handleCharacterFormSubmit = async (prompt, selectedAspectRatio = "landscape", selectedStyle = "realistic") => {
     if (!prompt) {
       setToast({ type: "error", message: "Please enter a character name" });
       setTimeout(() => setToast(null), 3000);

@@ -66,7 +66,7 @@ exports.handler = async function (event, context) {
     }
 
     // Extract parameters
-    const { prompt, aspect_ratio = "landscape", style = "default" } = requestBody;
+    const { prompt, aspect_ratio = "landscape", style = "realistic" } = requestBody;
     console.log("Character to process:", prompt);
     console.log("Aspect ratio:", aspect_ratio);
     console.log("Style:", style);

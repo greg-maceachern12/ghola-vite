@@ -45,7 +45,7 @@ const saveToAirtable = async (data) => {
               Prompt: prompt || "",
               Premium: premium ? "Yes" : "No",
               "Aspect Ratio": aspect_ratio || "landscape",
-              Style: style || "default",
+              Style: style || "realistic",
               "Image URL": imageUrl || "",
               "Created At": new Date().toISOString(),
               Source: "Ghola Web App",
@@ -125,7 +125,7 @@ exports.handler = async function (event, context) {
       prompt,
       premium,
       aspect_ratio = "landscape",
-      style = "default",
+      style = "realistic",
       character,
     } = requestBody;
     console.log("Character:", character);
@@ -213,7 +213,7 @@ exports.handler = async function (event, context) {
     const output = await replicate.run(modelVersion, { input });
     // If generation is successful, save to Airtable
     if (output && output.length > 0) {
-      const imageUrl = output; // Get the first image URL from the output
+      const imageUrl = output[0] || output; // Get the first image URL from the output
       // Save the generation data to Airtable
       console.log(imageUrl);
       await saveToAirtable({
