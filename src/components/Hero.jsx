@@ -25,7 +25,7 @@ const Hero = () => {
   const resultRef = useRef(null);
 
   // Throttling configuration (only used for non-premium users)
-  const THROTTLE_WINDOW = 24 * 60 * 60 * 1000; // 24 hours (1 day) in ms
+  const THROTTLE_WINDOW = 60 * 60 * 1000; // 24 hours (1 day) in ms
   const MAX_REQUESTS = 5;
   const THROTTLE_STORAGE_KEY = "ghola_request_timestamps";
 
