@@ -49,6 +49,7 @@ const saveToAirtable = async (data) => {
               "Image URL": imageUrl || "",
               "Created At": new Date().toISOString(),
               Source: "Ghola Web App",
+              attach: imageUrl ? [{ url: imageUrl }] : [] // Add the image URL as an attachment
             },
           },
         ],
@@ -213,7 +214,7 @@ exports.handler = async function (event, context) {
     const output = await replicate.run(modelVersion, { input });
     // If generation is successful, save to Airtable
     if (output && output.length > 0) {
-      const imageUrl = output[0] || output; // Get the first image URL from the output
+      const imageUrl = premium ? output : output[0]; // Use output directly for premium, output[0] for non-premium
       // Save the generation data to Airtable
       console.log(imageUrl);
       await saveToAirtable({
