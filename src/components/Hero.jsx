@@ -4,6 +4,7 @@ import GeneratedImage from "./GeneratedImage";
 import Toast from "./Toast";
 import LemonSqueezyPayment from "./LemonSqueezyPayment";
 import PremiumUpsell from "./PremiumUpsell";
+import RequestCounter from "./RequestCounter";
 
 const Hero = () => {
   const [loading, setLoading] = useState(false);
@@ -34,14 +35,36 @@ const Hero = () => {
       const recentRequests = getRecentRequests();
       saveRequestTimestamps(recentRequests);
       updateRequestsCounter();
-      const interval = setInterval(() => {
-        updateRequestsCounter();
-      }, 30 * 1000);
+      
+      // Only start intervals if we're throttled or close to being throttled
+      const throttleCheck = checkThrottle();
+      const isThrottled = throttleCheck.throttled;
+      const isNearThrottle = throttleCheck.remaining <= 1;
+      
+      let longInterval = null;
+      let shortInterval = null;
+      
+      // Update counter every 30 seconds for general usage
+      if (isNearThrottle || isThrottled) {
+        longInterval = setInterval(() => {
+          updateRequestsCounter();
+        }, 30 * 1000);
+      }
+      
+      // Add a more frequent update when throttled to keep timer accurate
+      if (isThrottled) {
+        shortInterval = setInterval(() => {
+          const throttleCheck = checkThrottle();
+          setResetTime(throttleCheck.resetTime);
+        }, 1000);
+      }
+      
       return () => {
-        clearInterval(interval);
+        if (longInterval) clearInterval(longInterval);
+        if (shortInterval) clearInterval(shortInterval);
       };
     }
-  }, [premium]);
+  }, [premium, throttled]);
 
   const getRequestTimestamps = () => {
     try {
@@ -233,11 +256,12 @@ const Hero = () => {
         message: "Character generated successfully!",
       });
 
-      // Show upsell after the first image generation if user is not premium
-      // and upsell hasn't been shown yet in this session
+      // Show upsell after 3 seconds if this is the first image generation
       if (!premium && isFirstImageGeneration && !upsellShownThisSession) {
-        setShowUpsell(true);
-        setUpsellShownThisSession(true);
+        setTimeout(() => {
+          setShowUpsell(true);
+          setUpsellShownThisSession(true);
+        }, 3000);
       }
       
       // Set first image generation to false after first successful generation
@@ -336,6 +360,16 @@ const Hero = () => {
 
       {/* Toast notification */}
       {toast && <Toast type={toast.type} message={toast.message} />}
+
+      {/* Request Counter for non-premium users */}
+      {!premium && (
+        <RequestCounter
+          used={requestsUsed}
+          max={maxRequests}
+          throttled={throttled}
+          resetTime={resetTime}
+        />
+      )}
 
       {/* Header with status indicators */}
       <header className="fixed top-0 left-0 right-0 py-4 px-6 backdrop-blur-md bg-black/40 border-b border-white/10 z-20 flex justify-between items-center">
@@ -450,13 +484,14 @@ const Hero = () => {
 
         {/* Generated Image Result */}
         <section ref={resultRef} className="w-full max-w-2xl mx-auto mb-16">
-          {generatedImage && !loading ? (
+          {(generatedImage || loading) ? (
             <div className="bg-white/5 backdrop-blur-lg p-6 rounded-2xl border border-white/10 shadow-xl transition-all">
               <GeneratedImage
                 src={generatedImage}
                 alt={`Generated image of ${characterName}`}
                 character={characterName}
                 premium={premium}
+                loading={loading}
               />
             </div>
           ) : (

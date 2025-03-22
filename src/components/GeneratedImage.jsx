@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { FaDownload, FaShare, FaInfoCircle, FaCrown } from "react-icons/fa";
 
-const GeneratedImage = ({ src, alt, character, premium }) => {
+const GeneratedImage = ({ src, alt, character, premium, loading }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
     // Reset loading state when src changes
-    setIsLoaded(false);
+    if (src) {
+      setIsLoaded(false);
+    }
   }, [src]);
 
   const handleDownload = () => {
@@ -53,37 +55,76 @@ const GeneratedImage = ({ src, alt, character, premium }) => {
 
   return (
     <div className="w-full">
-      <div className="relative rounded-xl overflow-hidden transition-all duration-300 transform">
-        {/* Loading state placeholder */}
-        {!isLoaded && (
-          <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/30 to-indigo-700/30 animate-pulse flex items-center justify-center">
-            <div className="w-10 h-10 border-4 border-white/20 border-t-white/80 rounded-full animate-spin"></div>
-          </div>
-        )}
-
-        {/* The image */}
-        <img
-          src={src}
-          alt={alt}
-          className={`w-full h-auto rounded-xl object-cover max-h-[600px] transition-opacity duration-500 ${
-            isLoaded ? "opacity-100" : "opacity-0"
-          }`}
-          onLoad={() => setIsLoaded(true)}
-        />
-
-        {/* Character name overlay */}
-        {character && isLoaded && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
-            <div className="flex items-center">
-              {premium && <FaCrown className="text-yellow-500 mr-2 text-xs" />}
-              <h3 className="text-white text-xl font-medium">{character}</h3>
+      <div className="relative rounded-xl overflow-hidden transition-all duration-300 transform min-h-[400px]">
+        {/* Always render either the loading state or the image container with consistent height */}
+        {loading ? (
+          <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/30 to-indigo-700/30 flex flex-col items-center justify-center h-full">
+            <div className="w-16 h-16 border-4 border-white/20 border-t-white/80 rounded-full animate-spin mb-6"></div>
+            <div className="text-white/80 text-center px-4">
+              <p className="text-lg font-medium">Creating your character...</p>
+              <p className="text-white/60 text-sm mt-2">This may take up to 20 seconds</p>
             </div>
           </div>
+        ) : (
+          <>
+            {/* Image loading indicator (only when image is loading after generation) */}
+            {src && !isLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/5">
+                <div className="w-8 h-8 border-2 border-white/30 border-t-white/80 rounded-full animate-spin"></div>
+              </div>
+            )}
+
+            {/* The image */}
+            {src && (
+              <img
+                src={src}
+                alt={alt}
+                className={`w-full h-auto rounded-xl object-cover max-h-[600px] transition-all duration-500 ${
+                  isLoaded ? "opacity-100" : "opacity-30"
+                }`}
+                style={{ minHeight: "400px" }}
+                onLoad={() => setIsLoaded(true)}
+              />
+            )}
+
+            {/* Placeholder when no image */}
+            {!src && (
+              <div className="w-full h-[400px] bg-white/5 flex items-center justify-center">
+                <div className="text-white/40 text-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-16 w-16 mx-auto mb-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <p className="text-lg">Ready to create</p>
+                </div>
+              </div>
+            )}
+
+            {/* Character name overlay - only show when image is loaded */}
+            {character && isLoaded && (
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
+                <div className="flex items-center">
+                  {premium && <FaCrown className="text-yellow-500 mr-2 text-xs" />}
+                  <h3 className="text-white text-xl font-medium">{character}</h3>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {/* Action buttons */}
-      {isLoaded && (
+      {/* Action buttons - only show when image is loaded and not loading */}
+      {src && isLoaded && !loading && (
         <div className="flex justify-between items-center mt-4">
           <div className="text-xs text-white/50 flex items-center gap-1">
             <FaInfoCircle />
@@ -93,11 +134,11 @@ const GeneratedImage = ({ src, alt, character, premium }) => {
                 <span className="text-blue-600 font-bold">Flux Pro</span>
               ) : (
                 <>
-                  Flux Schnell{" "}
+                  Free Version{" "}
                   <a
                     href="https://buy.polar.sh/polar_cl_ukvMp9Z1bIr9IrqDv9Y0Zs80WtqXf9gFLLkUH1Gd0B3"
                     target="_blank"
-                    className="text-blue-500 underline"
+                    className="text-blue-500 font-bold underline"
                   >
                     click here for unlimited HD generations
                   </a>

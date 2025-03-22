@@ -1,18 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FaClock, FaBolt } from 'react-icons/fa';
 
 const RequestCounter = ({ used, max, throttled, resetTime }) => {
   const [timeLeft, setTimeLeft] = useState(resetTime);
   const [isVisible, setIsVisible] = useState(true);
+  const timerRef = useRef(null);
   
+  // Initialize the timer when the component mounts or resetTime changes
   useEffect(() => {
-    let timer;
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    // Set initial time
+    setTimeLeft(resetTime);
+    
+    // Start a new timer if throttled
     if (throttled && resetTime > 0) {
-      setTimeLeft(resetTime);
-      timer = setInterval(() => {
+      timerRef.current = setInterval(() => {
         setTimeLeft(prev => {
           if (prev <= 1) {
-            clearInterval(timer);
+            clearInterval(timerRef.current);
+            timerRef.current = null;
             return 0;
           }
           return prev - 1;
@@ -20,14 +31,21 @@ const RequestCounter = ({ used, max, throttled, resetTime }) => {
       }, 1000);
     }
     
-    // Animate in and out on changes
-    setIsVisible(false);
-    setTimeout(() => setIsVisible(true), 50);
-    
+    // Cleanup on unmount
     return () => {
-      if (timer) clearInterval(timer);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
-  }, [throttled, resetTime, used]);
+  }, [resetTime, throttled]);
+  
+  // Handle visibility animation separately
+  useEffect(() => {
+    setIsVisible(false);
+    const timeout = setTimeout(() => setIsVisible(true), 50);
+    return () => clearTimeout(timeout);
+  }, [used, max, throttled]);
   
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
