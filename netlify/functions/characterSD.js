@@ -45,7 +45,7 @@ const saveToAirtable = async (data) => {
               Prompt: prompt || "",
               Premium: premium ? "Yes" : "No",
               "Aspect Ratio": aspect_ratio || "landscape",
-              Style: style || "realistic",
+              Style: style || "Realistic",
               "Image URL": imageUrl || "",
               "Created At": new Date().toISOString(),
               Source: "Ghola Web App",
@@ -126,7 +126,7 @@ exports.handler = async function (event, context) {
       prompt,
       premium,
       aspect_ratio = "landscape",
-      style = "realistic",
+      style = "Realistic",
       character,
     } = requestBody;
     console.log("Character:", character);
@@ -178,12 +178,16 @@ exports.handler = async function (event, context) {
       // We'll handle different styles by modifying the prompt
       let stylePrefix = "";
 
-      if (style === "anime") {
-        stylePrefix = "anime style, manga art, ";
-      } else if (style === "artistic") {
-        stylePrefix = "artistic painting, painterly style, ";
-      } else if (style === "claymation") {
-        stylePrefix = "claymation style, 3D clay model, ";
+      if (style.toLowerCase() === "ghibli") {
+        stylePrefix = "Studio Ghibli style, Hayao Miyazaki, whimsical hand-drawn animation, soft colors, magical atmosphere, ";
+      } else if (style.toLowerCase() === "nintendo") {
+        stylePrefix = "Nintendo game art style, video game character, bold colors, clean lines, playful cartoon style, ";
+      } else if (style.toLowerCase() === "lego") {
+        stylePrefix = "Lego minifigure style, plastic toy, blocky proportions, characteristic facial features, ";
+      } else if (style.toLowerCase() === "southpark") {
+        stylePrefix = "South Park TV show style, cutout animation, simple shapes, flat colors, characteristic facial features, ";
+      } else if (style.toLowerCase() === "pixar") {
+        stylePrefix = "Pixar animation style, 3D animated movie, smooth surfaces, expressive features, warm lighting, ";
       }
 
       // Prepend the style prefix to the prompt

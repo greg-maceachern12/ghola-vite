@@ -66,28 +66,50 @@ exports.handler = async function (event, context) {
     }
 
     // Extract parameters
-    const { prompt, aspect_ratio = "landscape", style = "realistic" } = requestBody;
+    const { prompt, aspect_ratio = "landscape", style = "Realistic" } = requestBody;
     console.log("Character to process:", prompt);
     console.log("Aspect ratio:", aspect_ratio);
     console.log("Style:", style);
     
-    const systemPrompt = `You are an expert at creating detailed character descriptions for AI image generation that produce photorealistic human portraits. The only input you will receive is {character_name} (e.g., "Lord Voldemort," "Tyrion Lannister," etc.). Based on this single input, you must:
+    // Add style-specific guidance to the system prompt
+    let styleGuidance = "";
+    switch (style.toLowerCase()) {
+      case "ghibli":
+        styleGuidance = "Create a description that captures the whimsical, hand-drawn aesthetic of Studio Ghibli films, with soft colors, expressive features, and magical atmosphere.";
+        break;
+      case "nintendo":
+        styleGuidance = "Create a description that matches Nintendo's iconic game art style, with bold colors, clean lines, and a playful, cartoon-like quality.";
+        break;
+      case "lego":
+        styleGuidance = "Create a description that matches the distinctive Lego minifigure style, with blocky proportions, plastic-like textures, and characteristic facial features.";
+        break;
+      case "southpark":
+        styleGuidance = "Create a description that matches South Park's distinctive cutout animation style, with simple shapes, flat colors, and characteristic facial features.";
+        break;
+      case "pixar":
+        styleGuidance = "Create a description that captures Pixar's signature 3D animation style, with smooth surfaces, expressive features, and warm, inviting lighting.";
+        break;
+      default:
+        styleGuidance = "Create a photoRealistic description with natural lighting, detailed textures, and professional photography quality.";
+    }
+
+    const systemPrompt = `You are an expert at creating detailed character descriptions for AI image generation. The only input you will receive is {character_name} (e.g., "Lord Voldemort," "Tyrion Lannister," etc.). Based on this single input, you must:
 
 Identify the canonical source (if known or commonly associated).
 Research and include any key defining traits from official or popular descriptions:
 Facial structure, body proportions, hair color/style, eye color/shape, age range.
 Distinctive features, including scars, tattoos, iconic accessories, etc.
-Ensure photorealistic detail by describing subtle imperfections and natural details (freckles, pores, wrinkles, asymmetries).
-Incorporate technical photography details to enhance realism (e.g., "portrait shot, 85mm lens, shallow depth of field, 8K, cinematic lighting, subsurface scattering").
+Ensure appropriate detail level for the requested style.
+Incorporate technical details to enhance the specific style requested.
 Then you will output a single, cohesive prompt that follows this structure:
 
 Character Name and the implied or canonical source (if identifiable).
 Age Range (as best inferred from canonical sources).
-Detailed facial and physical description (natural skin texture, slight asymmetries, any distinctive traits).
+Detailed facial and physical description appropriate to the requested style.
 Clothing and accessories authentic to the character's setting or style.
 Environment or background consistent with the character's world.
 Pose and expression that reflect the character's personality or mood.
-Professional photography descriptors and high-resolution rendering terms for maximum realism.`;
+Style-specific technical descriptors for maximum quality.`;
     
     if (!prompt) {
       return {
@@ -118,12 +140,9 @@ Professional photography descriptors and high-resolution rendering terms for max
       messages: [
         {
           role: "system",
-          content: `${systemPrompt} ${aspectRatioGuidance}`,
+          content: `${systemPrompt} ${aspectRatioGuidance} ${styleGuidance}`,
         },
-        { role: "user", content: `${prompt}
-Portrait photography, photorealistic, natural lighting, cinematic quality, 
-detailed skin texture, professional photography, 8k, highly detailed human features, 
-portrait shot, 85mm lens, shallow depth of field, subsurface scattering.` },
+        { role: "user", content: prompt },
       ],
     });
 

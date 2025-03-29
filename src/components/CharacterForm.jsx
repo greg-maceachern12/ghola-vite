@@ -7,47 +7,55 @@ import { BsAspectRatio } from "react-icons/bs";
 
 // Import the example images from ExampleImages component
 export const EXAMPLE_IMAGES = [
-  {
-    src: "/assets/examples/percy.jpeg",
-    alt: "Percy Jackson",
-    character: "Percy Jackson",
-    style: "realistic",
-  },
-  {
-    src: "/assets/examples/eragon.jpeg",
-    alt: "Eragon",
-    character: "Eragon",
-    style: "realistic",
-  },
+
   {
     src: "/assets/examples/mark.png",
     alt: "Mark Grayson",
     character: "Mark Grayson",
-    style: "realistic",
+    style: "Nintendo",
   },
   {
-    src: "/assets/examples/artemis.jpeg",
-    alt: "Artemis Fowl",
-    character: "Artemis Fowl",
-    style: "artistic",
+    src: "/assets/examples/gandalf.png",
+    alt: "Gandalf",
+    character: "Gandalf",
+    style: "Studio Ghibli",
   },
   {
-    src: "/assets/examples/maxi.jpeg",
-    alt: "Maximum Ride",
-    character: "Maximum Ride",
-    style: "anime",
+    src: "/assets/examples/mario.png",
+    alt: "Mario",
+    character: "Mario",
+    style: "Legend of Zelda",
+  },
+  
+  {
+    src: "/assets/examples/paul.png",
+    alt: "Paul Atreidies",
+    character: "Paul Atreidies",
+    style: "Lego",
   },
   {
     src: "/assets/examples/lyra.jpeg",
     alt: "Lyra Belacqua",
     character: "Lyra Belacqua",
-    style: "realistic",
+    style: "Realistic",
+  },
+  {
+    src: "/assets/examples/eragon.jpeg",
+    alt: "Eragon",
+    character: "Eragon",
+    style: "Realistic",
   },
   {
     src: "/assets/examples/tris.jpeg",
     alt: "Tris Prior",
     character: "Tris Prior",
-    style: "realistic",
+    style: "Realistic",
+  },
+  {
+    src: "/assets/examples/percy.jpeg",
+    alt: "Percy Jackson",
+    character: "Percy Jackson",
+    style: "Realistic",
   },
 ];
 
@@ -70,7 +78,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [isHovering, setIsHovering] = useState(false);
   const [aspectRatio, setAspectRatio] = useState("portrait");
-  const [style, setStyle] = useState("realistic");
+  const [style, setStyle] = useState("Realistic");
   const [showStyleMenu, setShowStyleMenu] = useState(false);
   const [showPremiumTooltip, setShowPremiumTooltip] = useState(false);
   const inputRef = useRef(null);
@@ -144,7 +152,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
       onSubmit(
         example.character,
         example.aspectRatio,
-        premium ? example.style : "realistic"
+        premium ? example.style : "Realistic"
       );
     }, 100);
   };
@@ -179,7 +187,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   alt={example.alt}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
-                {example.style !== "realistic" &&
+                {example.style !== "Realistic" &&
                   !premium && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                       <FaLock className="text-white/80 text-lg" />
@@ -196,14 +204,14 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   } flex items-center gap-1`}
                 >
                   {!premium &&
-                    example.style !== "realistic" &&
-                    example.style !== "realistic" && (
+                    example.style !== "Realistic" &&
+                    example.style !== "Realistic" && (
                       <FaLock className="text-[10px]" />
                     )}
-                  {example.style === "realistic" ? "realistic" : example.style}
+                  {example.style === "Realistic" ? "Realistic" : example.style}
                 </span>
                 {premium &&
-                  example.style !== "realistic" && (
+                  example.style !== "Realistic" && (
                     <FaCrown className="text-yellow-500 ml-1 text-xs" />
                   )}
               </div>
@@ -309,7 +317,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
             >
               <FaPalette />
               <span>
-                {style === "realistic"
+                {style === "Realistic"
                   ? "Realistic"
                   : style.charAt(0).toUpperCase() + style.slice(1)}
               </span>
@@ -330,9 +338,9 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   <li>
                     <button
                       type="button"
-                      onClick={() => handleStyleSelect("realistic")}
+                      onClick={() => handleStyleSelect("Realistic")}
                       className={`block w-full text-left px-4 py-2 text-sm ${
-                        style === "realistic"
+                        style === "Realistic"
                           ? "bg-blue-500/20 text-blue-400"
                           : "hover:bg-white/5"
                       } ${!premium && "opacity-70"}`}
@@ -348,15 +356,15 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   <li>
                     <button
                       type="button"
-                      onClick={() => handleStyleSelect("anime")}
+                      onClick={() => handleStyleSelect("ghibli")}
                       className={`block w-full text-left px-4 py-2 text-sm ${
-                        style === "anime"
+                        style === "ghibli"
                           ? "bg-blue-500/20 text-blue-400"
                           : "hover:bg-white/5"
                       } ${!premium && "opacity-70"}`}
                     >
                       <div className="flex items-center justify-between">
-                        <span>Anime</span>
+                        <span>Studio Ghibli</span>
                         {!premium && (
                           <FaLock className="text-white/60 text-xs" />
                         )}
@@ -366,15 +374,15 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   <li>
                     <button
                       type="button"
-                      onClick={() => handleStyleSelect("artistic")}
+                      onClick={() => handleStyleSelect("nintendo")}
                       className={`block w-full text-left px-4 py-2 text-sm ${
-                        style === "artistic"
+                        style === "nintendo"
                           ? "bg-blue-500/20 text-blue-400"
                           : "hover:bg-white/5"
                       } ${!premium && "opacity-70"}`}
                     >
                       <div className="flex items-center justify-between">
-                        <span>Artistic</span>
+                        <span>Nintendo</span>
                         {!premium && (
                           <FaLock className="text-white/60 text-xs" />
                         )}
@@ -384,15 +392,51 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   <li>
                     <button
                       type="button"
-                      onClick={() => handleStyleSelect("claymation")}
+                      onClick={() => handleStyleSelect("lego")}
                       className={`block w-full text-left px-4 py-2 text-sm ${
-                        style === "claymation"
+                        style === "lego"
                           ? "bg-blue-500/20 text-blue-400"
                           : "hover:bg-white/5"
                       } ${!premium && "opacity-70"}`}
                     >
                       <div className="flex items-center justify-between">
-                        <span>Claymation</span>
+                        <span>Lego</span>
+                        {!premium && (
+                          <FaLock className="text-white/60 text-xs" />
+                        )}
+                      </div>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => handleStyleSelect("southpark")}
+                      className={`block w-full text-left px-4 py-2 text-sm ${
+                        style === "southpark"
+                          ? "bg-blue-500/20 text-blue-400"
+                          : "hover:bg-white/5"
+                      } ${!premium && "opacity-70"}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>South Park</span>
+                        {!premium && (
+                          <FaLock className="text-white/60 text-xs" />
+                        )}
+                      </div>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => handleStyleSelect("pixar")}
+                      className={`block w-full text-left px-4 py-2 text-sm ${
+                        style === "pixar"
+                          ? "bg-blue-500/20 text-blue-400"
+                          : "hover:bg-white/5"
+                      } ${!premium && "opacity-70"}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>Pixar</span>
                         {!premium && (
                           <FaLock className="text-white/60 text-xs" />
                         )}
