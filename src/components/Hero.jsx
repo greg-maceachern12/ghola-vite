@@ -181,16 +181,12 @@ const Hero = () => {
     }
   };
 
-  const handleCharacterFormSubmit = async (prompt, selectedAspectRatio = "landscape", selectedStyle = "Realistic") => {
+  const handleCharacterFormSubmit = async (prompt, selectedAspectRatio = "landscape", selectedStyle = "realistic") => {
     if (!prompt) {
       setToast({ type: "error", message: "Please enter a character name" });
       setTimeout(() => setToast(null), 3000);
       return;
     }
-
-    // Update the aspect ratio and style
-    // setAspectRatio(selectedAspectRatio);
-    // setImageStyle(selectedStyle);
 
     if (!premium) {
       const throttleCheck = checkThrottle();
@@ -217,7 +213,11 @@ const Hero = () => {
       const promptResponse = await fetch("/.netlify/functions/charPrompt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ 
+          prompt,
+          aspect_ratio: selectedAspectRatio,
+          style: selectedStyle 
+        }),
       });
 
       if (!promptResponse.ok) {

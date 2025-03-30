@@ -7,55 +7,53 @@ import { BsAspectRatio } from "react-icons/bs";
 
 // Import the example images from ExampleImages component
 export const EXAMPLE_IMAGES = [
-
   {
     src: "/assets/examples/mark.png",
     alt: "Mark Grayson",
     character: "Mark Grayson",
-    style: "Nintendo",
+    style: "nintendo",
   },
   {
     src: "/assets/examples/gandalf.png",
     alt: "Gandalf",
     character: "Gandalf",
-    style: "Studio Ghibli",
+    style: "ghibli",
   },
   {
     src: "/assets/examples/mario.png",
     alt: "Mario",
     character: "Mario",
-    style: "Legend of Zelda",
+    style: "nintendo",
   },
-  
   {
     src: "/assets/examples/paul.png",
     alt: "Paul Atreidies",
     character: "Paul Atreidies",
-    style: "Lego",
+    style: "lego",
   },
   {
     src: "/assets/examples/lyra.jpeg",
     alt: "Lyra Belacqua",
     character: "Lyra Belacqua",
-    style: "Realistic",
+    style: "realistic",
   },
   {
     src: "/assets/examples/eragon.jpeg",
     alt: "Eragon",
     character: "Eragon",
-    style: "Realistic",
+    style: "realistic",
   },
   {
     src: "/assets/examples/tris.jpeg",
     alt: "Tris Prior",
     character: "Tris Prior",
-    style: "Realistic",
+    style: "realistic",
   },
   {
     src: "/assets/examples/percy.jpeg",
     alt: "Percy Jackson",
     character: "Percy Jackson",
-    style: "Realistic",
+    style: "realistic",
   },
 ];
 
@@ -78,7 +76,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [isHovering, setIsHovering] = useState(false);
   const [aspectRatio, setAspectRatio] = useState("portrait");
-  const [style, setStyle] = useState("Realistic");
+  const [style, setStyle] = useState("realistic");
   const [showStyleMenu, setShowStyleMenu] = useState(false);
   const [showPremiumTooltip, setShowPremiumTooltip] = useState(false);
   const inputRef = useRef(null);
@@ -115,7 +113,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(prompt.trim(), aspectRatio, style);
+    onSubmit(prompt.trim(), aspectRatio, style.toLowerCase());
   };
 
   const getRandomCharacter = () => {
@@ -134,7 +132,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
 
   const handleStyleSelect = (newStyle) => {
     if (premium) {
-      setStyle(newStyle);
+      setStyle(newStyle.toLowerCase());
       setShowStyleMenu(false);
     } else {
       setShowPremiumTooltip(true);
@@ -146,13 +144,13 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
     setPrompt(example.character);
     setAspectRatio(example.aspectRatio);
     if (premium && example.style) {
-      setStyle(example.style);
+      setStyle(example.style.toLowerCase());
     }
     setTimeout(() => {
       onSubmit(
         example.character,
         example.aspectRatio,
-        premium ? example.style : "Realistic"
+        premium ? example.style.toLowerCase() : "realistic"
       );
     }, 100);
   };

@@ -70,47 +70,59 @@ exports.handler = async function (event, context) {
     console.log("Character to process:", prompt);
     console.log("Aspect ratio:", aspect_ratio);
     console.log("Style:", style);
-    
-    // Add style-specific guidance to the system prompt
+
+    // Add aspect ratio guidance
+    let aspectRatioGuidance = "";
+    if (aspect_ratio === "portrait") {
+      aspectRatioGuidance = "Adapt the description for a vertical/portrait (2:3) format. Focus on upper body and face.";
+    } else if (aspect_ratio === "square") {
+      aspectRatioGuidance = "Adapt the description for a square (1:1) format, ensuring a balanced composition.";
+    } else { // landscape or default
+      aspectRatioGuidance = "Adapt the description for a horizontal/landscape (3:2) format, allowing for more environment or context.";
+    }
+
+    // Add style-specific guidance with more detail
     let styleGuidance = "";
     switch (style.toLowerCase()) {
       case "ghibli":
-        styleGuidance = "Create a description that captures the whimsical, hand-drawn aesthetic of Studio Ghibli films, with soft colors, expressive features, and magical atmosphere.";
+        styleGuidance = "Emphasize a hand-drawn, painted look reminiscent of Hayao Miyazaki. Use terms like 'watercolor textures', 'soft outlines', 'lush natural backgrounds', 'expressive, slightly rounded features', 'gentle lighting', 'whimsical atmosphere'.";
         break;
       case "nintendo":
-        styleGuidance = "Create a description that matches Nintendo's iconic game art style, with bold colors, clean lines, and a playful, cartoon-like quality.";
+        styleGuidance = "Focus on bright, saturated, primary colors. Use terms like 'cel-shaded', 'bold outlines', 'clean vector art style', 'appealing character design', 'simplified shapes', 'game art'.";
         break;
       case "lego":
-        styleGuidance = "Create a description that matches the distinctive Lego minifigure style, with blocky proportions, plastic-like textures, and characteristic facial features.";
+        styleGuidance = "Describe the character *as* a Lego minifigure. Use terms like 'plastic sheen', 'cylindrical head', 'blocky torso', 'claw hands', 'printed facial expression', 'studs', 'modular bricks'.";
         break;
       case "southpark":
-        styleGuidance = "Create a description that matches South Park's distinctive cutout animation style, with simple shapes, flat colors, and characteristic facial features.";
+        styleGuidance = "Describe the character using the distinctive South Park cutout animation style. Use terms like 'construction paper texture', 'simple geometric shapes', 'flat colors', 'bold black outlines', 'minimalist features', 'crude animation style'.";
         break;
       case "pixar":
-        styleGuidance = "Create a description that captures Pixar's signature 3D animation style, with smooth surfaces, expressive features, and warm, inviting lighting.";
+        styleGuidance = "Aim for a high-quality 3D render look. Use terms like 'smooth surfaces', 'subsurface scattering', 'realistic yet stylized features', 'expressive eyes', 'cinematic lighting', 'detailed textures', 'warm color palette'.";
         break;
-      default:
-        styleGuidance = "Create a photoRealistic description with natural lighting, detailed textures, and professional photography quality.";
+      default: // Realistic
+        styleGuidance = "Focus on photorealism. Use terms like 'photorealistic', 'DSLR photo', 'sharp focus', 'detailed skin texture', 'natural lighting', '8k resolution', 'cinematic composition', 'professional photography'.";
     }
 
-    const systemPrompt = `You are an expert at creating detailed character descriptions for AI image generation. The only input you will receive is {character_name} (e.g., "Lord Voldemort," "Tyrion Lannister," etc.). Based on this single input, you must:
+    // Revised system prompt emphasizing style integration
+    const systemPrompt = `You are an expert at creating detailed character descriptions for AI image generation, specifically tailored to the requested visual style: '${style}'. The only input you will receive is {character_name}. Your primary goal is to generate a prompt that results in an image strongly reflecting this style.
 
-Identify the canonical source (if known or commonly associated).
-Research and include any key defining traits from official or popular descriptions:
-Facial structure, body proportions, hair color/style, eye color/shape, age range.
-Distinctive features, including scars, tattoos, iconic accessories, etc.
-Ensure appropriate detail level for the requested style.
-Incorporate technical details to enhance the specific style requested.
-Then you will output a single, cohesive prompt that follows this structure:
+Based on the character name and the target style ('${style}'), you must:
 
-Character Name and the implied or canonical source (if identifiable).
-Age Range (as best inferred from canonical sources).
-Detailed facial and physical description appropriate to the requested style.
-Clothing and accessories authentic to the character's setting or style.
-Environment or background consistent with the character's world.
-Pose and expression that reflect the character's personality or mood.
-Style-specific technical descriptors for maximum quality.`;
-    
+1.  **Identify Source & Traits:** Determine the canonical source (if known) and research key defining traits (facial structure, body, hair, eyes, age, distinctive features like scars/tattoos).
+2.  **Integrate Style:** Weave the requested style ('${style}') throughout the description. Use keywords, artistic techniques, and visual elements specific to that style. ${styleGuidance}
+3.  **Add Technical Details:** Include style-specific technical descriptors (e.g., 'cinematic lighting', 'cel-shaded', 'detailed texture', 'soft focus') to enhance quality according to the style.
+4.  **Consider Aspect Ratio:** ${aspectRatioGuidance}
+5.  **Structure Output:** Output a single, cohesive prompt including:
+    *   Character Name and source (if identifiable).
+    *   Age Range.
+    *   Detailed facial/physical description *in the requested style*.
+    *   Clothing/accessories authentic to the character *and style*.
+    *   Environment/background consistent with the character's world *and style*.
+    *   Pose/expression reflecting personality *and style*.
+    *   Style-specific technical descriptors.
+
+Output *only* the final prompt, ready for an image generation model.`;
+
     if (!prompt) {
       return {
         statusCode: 400,
@@ -124,23 +136,13 @@ Style-specific technical descriptors for maximum quality.`;
       };
     }
 
-    // Add aspect ratio guidance to the system prompt when needed
-    let aspectRatioGuidance = "";
-    if (aspect_ratio === "portrait") {
-      aspectRatioGuidance = "Create the description to work well in a vertical/portrait (2:3) format. Focus on upper body and face.";
-    } else if (aspect_ratio === "square") {
-      aspectRatioGuidance = "Create the description to work well in a square (1:1) format, with a balanced composition.";
-    } else {
-      aspectRatioGuidance = "Create the description to work well in a horizontal/landscape (3:2) format, allowing for more environment or context.";
-    }
-
     // Call OpenAI API
     const chatResponse = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content: `${systemPrompt} ${aspectRatioGuidance} ${styleGuidance}`,
+          content: systemPrompt, // Use the revised system prompt which now includes style/aspect guidance
         },
         { role: "user", content: prompt },
       ],
