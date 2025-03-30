@@ -10,6 +10,7 @@ const Hero = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [generatedImage, setGeneratedImage] = useState(null);
+  const [email, setEmail] = useState("");
   const [characterName, setCharacterName] = useState("");
   const [requestsUsed, setRequestsUsed] = useState(0);
   const [maxRequests, setMaxRequests] = useState(5);
@@ -238,7 +239,8 @@ const Hero = () => {
           premium, 
           aspect_ratio: selectedAspectRatio,
           style: selectedStyle,
-          character: prompt
+          character: prompt,
+          email: email
         }),
       });
 
@@ -527,8 +529,11 @@ const Hero = () => {
         {/* Premium upgrade section */}
         <section id="premium-upgrade" className="w-full max-w-3xl mx-auto">
           <LemonSqueezyPayment
-            onValidationSuccess={(details) => {
-              setPremium(true);
+            onStatusCheck={({ email, isPremium }) => {
+              setPremium(isPremium);
+              setEmail(email);
+              // You can store the email in state if needed
+              console.log(email);
             }}
           />
         </section>
