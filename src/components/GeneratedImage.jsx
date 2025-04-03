@@ -143,8 +143,7 @@ const GeneratedImage = ({ src, alt, character, premium, loading }) => {
                     click here for unlimited HD generations
                   </a>
                 </>
-              )}{" "}
-              model
+              )}
             </span>
           </div>
 

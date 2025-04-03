@@ -104,16 +104,7 @@ exports.handler = async (event) => {
   let modelVersion, finalPrompt = prompt;
   if (premium) {
     modelVersion = "black-forest-labs/flux-1.1-pro";
-    // Map style to prefix
-    const stylePrefixes = {
-      ghibli: "Studio Ghibli style, Hayao Miyazaki, whimsical hand-drawn animation, soft colors, magical atmosphere, ",
-      nintendo: "Nintendo game art style, video game character, bold colors, clean lines, playful cartoon style, ",
-      lego: "Lego minifigure style, plastic toy, blocky proportions, characteristic facial features, ",
-      southpark: "South Park TV show style, cutout animation, simple shapes, flat colors, characteristic facial features, ",
-      pixar: "Pixar animation style, 3D animated movie, smooth surfaces, expressive features, warm lighting, "
-    };
-    const prefix = stylePrefixes[style.toLowerCase()] || "";
-    finalPrompt = prefix ? prefix + prompt : prompt;
+    finalPrompt = prompt;
   } else {
     modelVersion = "black-forest-labs/flux-schnell";
   }

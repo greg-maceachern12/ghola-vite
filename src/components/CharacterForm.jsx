@@ -20,10 +20,10 @@ export const EXAMPLE_IMAGES = [
     style: "ghibli",
   },
   {
-    src: "/assets/examples/mario.png",
+    src: "/assets/examples/mario.jpg",
     alt: "Mario",
     character: "Mario",
-    style: "nintendo",
+    style: "lego",
   },
   {
     src: "/assets/examples/paul.png",
@@ -141,6 +141,13 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
   };
 
   const handleExampleClick = (example) => {
+    // Only allow clicking if the user has premium or if the style is realistic
+    if (!premium && example.style !== "realistic") {
+      setShowPremiumTooltip(true);
+      setTimeout(() => setShowPremiumTooltip(false), 3000);
+      return;
+    }
+
     setPrompt(example.character);
     setAspectRatio(example.aspectRatio);
     if (premium && example.style) {
@@ -177,7 +184,9 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
             <div
               key={index}
               onClick={() => handleExampleClick(example)}
-              className="flex flex-col items-center mx-6 cursor-pointer group flex-shrink-0"
+              className={`flex flex-col items-center mx-6 cursor-pointer group flex-shrink-0 ${
+                !premium && example.style !== "realistic" ? "opacity-70" : ""
+              }`}
             >
               <div className="relative w-28 h-28 mb-3 overflow-hidden rounded-full border-2 border-white/20 group-hover:border-white/60 transition-all">
                 <img
@@ -185,7 +194,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   alt={example.alt}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
-                {example.style !== "Realistic" &&
+                {example.style !== "realistic" &&
                   !premium && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                       <FaLock className="text-white/80 text-lg" />
@@ -202,14 +211,14 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   } flex items-center gap-1`}
                 >
                   {!premium &&
-                    example.style !== "Realistic" &&
-                    example.style !== "Realistic" && (
+                    example.style !== "realistic" &&
+                    example.style !== "realistic" && (
                       <FaLock className="text-[10px]" />
                     )}
-                  {example.style === "Realistic" ? "Realistic" : example.style}
+                  {example.style === "realistic" ? "realistic" : example.style}
                 </span>
                 {premium &&
-                  example.style !== "Realistic" && (
+                  example.style !== "realistic" && (
                     <FaCrown className="text-yellow-500 ml-1 text-xs" />
                   )}
               </div>
@@ -315,7 +324,7 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
             >
               <FaPalette />
               <span>
-                {style === "Realistic"
+                {style === "realistic"
                   ? "Realistic"
                   : style.charAt(0).toUpperCase() + style.slice(1)}
               </span>
@@ -325,7 +334,15 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
 
             {showPremiumTooltip && !premium && (
               <div className="absolute right-0 mt-2 p-2 bg-black/90 backdrop-blur-sm border border-yellow-500/30 rounded shadow-xl z-30 w-48 text-xs text-white/80 animate-fade-in">
-                Style options are only available with premium access
+                Style options are only available with{' '}
+                <a 
+                  href="https://buy.polar.sh/polar_cl_ukvMp9Z1bIr9IrqDv9Y0Zs80WtqXf9gFLLkUH1Gd0B3" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-yellow-500 hover:text-yellow-400 underline"
+                >
+                  premium access
+                </a>
                 <div className="absolute -top-2 right-5 w-3 h-3 bg-black/90 border-t border-l border-yellow-500/30 transform rotate-45"></div>
               </div>
             )}
@@ -336,9 +353,9 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   <li>
                     <button
                       type="button"
-                      onClick={() => handleStyleSelect("Realistic")}
+                      onClick={() => handleStyleSelect("realistic")}
                       className={`block w-full text-left px-4 py-2 text-sm ${
-                        style === "Realistic"
+                        style === "realistic"
                           ? "bg-blue-500/20 text-blue-400"
                           : "hover:bg-white/5"
                       } ${!premium && "opacity-70"}`}

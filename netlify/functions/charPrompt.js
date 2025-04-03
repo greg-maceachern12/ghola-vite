@@ -71,16 +71,6 @@ exports.handler = async function (event, context) {
     console.log("Aspect ratio:", aspect_ratio);
     console.log("Style:", style);
 
-    // Add aspect ratio guidance
-    let aspectRatioGuidance = "";
-    if (aspect_ratio === "portrait") {
-      aspectRatioGuidance = "Adapt the description for a vertical/portrait (2:3) format. Focus on upper body and face.";
-    } else if (aspect_ratio === "square") {
-      aspectRatioGuidance = "Adapt the description for a square (1:1) format, ensuring a balanced composition.";
-    } else { // landscape or default
-      aspectRatioGuidance = "Adapt the description for a horizontal/landscape (3:2) format, allowing for more environment or context.";
-    }
-
     // Add style-specific guidance with more detail
     let styleGuidance = "";
     switch (style.toLowerCase()) {
@@ -111,8 +101,7 @@ Based on the character name and the target style ('${style}'), you must:
 1.  **Identify Source & Traits:** Determine the canonical source (if known) and research key defining traits (facial structure, body, hair, eyes, age, distinctive features like scars/tattoos).
 2.  **Integrate Style:** Weave the requested style ('${style}') throughout the description. Use keywords, artistic techniques, and visual elements specific to that style. ${styleGuidance}
 3.  **Add Technical Details:** Include style-specific technical descriptors (e.g., 'cinematic lighting', 'cel-shaded', 'detailed texture', 'soft focus') to enhance quality according to the style.
-4.  **Consider Aspect Ratio:** ${aspectRatioGuidance}
-5.  **Structure Output:** Output a single, cohesive prompt including:
+4.  **Structure Output:** Output a single, cohesive prompt including:
     *   Character Name and source (if identifiable).
     *   Age Range.
     *   Detailed facial/physical description *in the requested style*.
