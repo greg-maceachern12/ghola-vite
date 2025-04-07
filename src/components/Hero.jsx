@@ -427,7 +427,7 @@ const Hero = () => {
                 </div>
                 <p className="text-blue-100 text-xs">
                   <span className="font-medium">Upgrade to Premium</span>
-                  <span className="hidden sm:inline"> - Unlimited HD generations</span>
+                  <span className="hidden sm:inline"> - Unlimited HD generations<strong> 50% off today only!</strong></span>
                 </p>
               </div>
               <button 
