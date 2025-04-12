@@ -111,7 +111,6 @@ const saveToAirtable = async (data) => {
     const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(
       AIRTABLE_BASE_ID
     );
-
     // Create a new record in Airtable
     return new Promise((resolve, reject) => {
       base(AIRTABLE_TABLE_NAME).create(
@@ -197,7 +196,9 @@ exports.handler = async (event) => {
 
   try {
     const output = await replicate.run(modelVersion, { input });
-    const imageUrl = premium ? output : output[0];
+    console.log(output)
+    const imageUrl = output[0];
+
     if (output && output.length > 0) {
       await saveToAirtable({ character, prompt, premium, aspect_ratio, style, imageUrl, email });
       await sendToLoops(email, premium);
