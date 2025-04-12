@@ -47,7 +47,8 @@ const sendToLoops = async (email, premium) => {
       email,
       userGroup: "Ghola Users",
       source: "Ghola Web App Signup",
-      subscribed: premium
+      subscribed: "yes",
+      premium: premium
     };
 
     if (findResponse.status === 200) {
