@@ -1,6 +1,7 @@
 // netlify/functions/characterSD.js
 const Replicate = require("replicate");
 const Airtable = require("airtable");
+const Loops = require("loops");
 
 // Common CORS headers
 const CORS_HEADERS = {
@@ -21,6 +22,73 @@ const sendResponse = (statusCode, body) => ({
   body: JSON.stringify(body),
   headers: { "Content-Type": "application/json", ...CORS_HEADERS },
 });
+
+// Function to send email to Loops.so
+const sendToLoops = async (email, premium) => {
+  if (!email || email === "not-entered") return false;
+
+  const LOOPS_API_KEY = process.env.LOOPS_API_KEY;
+  if (!LOOPS_API_KEY) {
+    console.error("Loops API key not configured");
+    return false;
+  }
+
+  try {
+    // First try to find if contact exists
+    const findResponse = await fetch(`https://app.loops.so/api/v1/contacts/find?email=${encodeURIComponent(email)}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${LOOPS_API_KEY}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    const contactData = {
+      email,
+      userGroup: "Ghola Users",
+      source: "Ghola Web App Signup",
+      subscribed: premium
+    };
+
+    if (findResponse.status === 200) {
+      // Contact exists, update it
+      const updateResponse = await fetch("https://app.loops.so/api/v1/contacts/update", {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${LOOPS_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(contactData)
+      });
+
+      if (!updateResponse.ok) {
+        const error = await updateResponse.json();
+        throw new Error(error.message || "Failed to update contact in Loops.so");
+      }
+    } else {
+      // Contact doesn't exist, create it
+      const createResponse = await fetch("https://app.loops.so/api/v1/contacts/create", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${LOOPS_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(contactData)
+      });
+
+      if (!createResponse.ok) {
+        const error = await createResponse.json();
+        throw new Error(error.message || "Failed to create contact in Loops.so");
+      }
+    }
+
+    console.log("Successfully synced contact with Loops.so");
+    return true;
+  } catch (error) {
+    console.error("Error sending to Loops.so:", error);
+    return false;
+  }
+};
 
 // Function to save generation data to Airtable
 const saveToAirtable = async (data) => {
@@ -103,7 +171,8 @@ exports.handler = async (event) => {
 
   let modelVersion, finalPrompt = prompt;
   if (premium) {
-    modelVersion = "black-forest-labs/flux-1.1-pro";
+    // modelVersion = "black-forest-labs/flux-1.1-pro";
+    modelVersion = "black-forest-labs/flux-schnell";
     finalPrompt = prompt;
   } else {
     modelVersion = "black-forest-labs/flux-schnell";
@@ -130,6 +199,7 @@ exports.handler = async (event) => {
     const imageUrl = premium ? output : output[0];
     if (output && output.length > 0) {
       await saveToAirtable({ character, prompt, premium, aspect_ratio, style, imageUrl, email });
+      await sendToLoops(email, premium);
     }
     return sendResponse(200, { result: output });
   } catch (error) {

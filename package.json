@@ -12,6 +12,7 @@
   "dependencies": {
     "@polar-sh/sdk": "^0.30.0",
     "airtable": "^0.12.2",
+    "loops": "^0.1.5",
     "lucide-react": "^0.477.0",
     "openai": "^4.86.1",
     "react": "^18.2.0",
