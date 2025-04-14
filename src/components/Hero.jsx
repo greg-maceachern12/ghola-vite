@@ -5,6 +5,7 @@ import Toast from "./Toast";
 import LemonSqueezyPayment from "./LemonSqueezyPayment";
 import PremiumUpsell from "./PremiumUpsell";
 import RequestCounter from "./RequestCounter";
+import PremiumPromo from "./PremiumPromo";
 
 const Hero = () => {
   const [loading, setLoading] = useState(false);
@@ -21,6 +22,7 @@ const Hero = () => {
   const [showUpsell, setShowUpsell] = useState(false); // State to control the upsell dialog visibility
   const [upsellShownThisSession, setUpsellShownThisSession] = useState(false); // Track if upsell has been shown this session
   const [isFirstImageGeneration, setIsFirstImageGeneration] = useState(true); // Track if this is the first image generation
+  const [showPromo, setShowPromo] = useState(true);
   // const [aspectRatio, setAspectRatio] = useState("landscape"); // Default aspect ratio
   // const [imageStyle, setImageStyle] = useState("default"); // Default style
 
@@ -30,6 +32,14 @@ const Hero = () => {
   const THROTTLE_WINDOW = 60 * 60 * 1000; // 24 hours (1 day) in ms
   const MAX_REQUESTS = 5;
   const THROTTLE_STORAGE_KEY = "ghola_request_timestamps";
+
+  // Check for premium override on component mount
+  useEffect(() => {
+    const isPremiumOverride = import.meta.env.VITE_PREMIUM_OVERRIDE === 'true';
+    if (isPremiumOverride) {
+      setPremium(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!premium) {
@@ -348,6 +358,11 @@ const Hero = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleGetStarted = () => {
+    setShowPromo(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="relative min-h-screen text-white">
       {/* Background with improved layering */}
@@ -362,6 +377,11 @@ const Hero = () => {
 
       {/* Toast notification */}
       {toast && <Toast type={toast.type} message={toast.message} />}
+
+      {/* Premium Promo Banner - show if premium override is true and promo hasn't been dismissed */}
+      {showPromo && import.meta.env.VITE_PREMIUM_OVERRIDE === 'true' && (
+        <PremiumPromo onGetStarted={handleGetStarted} />
+      )}
 
       {/* Request Counter for non-premium users */}
       {!premium && (
@@ -530,10 +550,12 @@ const Hero = () => {
         <section id="premium-upgrade" className="w-full max-w-3xl mx-auto">
           <LemonSqueezyPayment
             onStatusCheck={({ email, isPremium }) => {
-              setPremium(isPremium);
+              // Only update premium status if there's no override
+              const isPremiumOverride = import.meta.env.VITE_PREMIUM_OVERRIDE === 'true';
+              if (!isPremiumOverride) {
+                setPremium(isPremium);
+              }
               setEmail(email);
-              // You can store the email in state if needed
-              console.log(email);
             }}
           />
         </section>

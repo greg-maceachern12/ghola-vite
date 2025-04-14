@@ -74,15 +74,15 @@ const PremiumUpsell = ({
               </div>
               <div className="flex items-start">
                 <Check className="text-blue-400 w-5 h-5 mt-0.5 mr-2" />
+                <p className="text-white">Unique styles (Ghibli, Lego, Dispo)</p>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-blue-400 w-5 h-5 mt-0.5 mr-2" />
                 <p className="text-white">Higher resolution images</p>
               </div>
               <div className="flex items-start">
                 <Check className="text-blue-400 w-5 h-5 mt-0.5 mr-2" />
                 <p className="text-white">Priority processing</p>
-              </div>
-              <div className="flex items-start">
-                <Check className="text-blue-400 w-5 h-5 mt-0.5 mr-2" />
-                <p className="text-white">NSFW Content</p>
               </div>
             </div>
 
