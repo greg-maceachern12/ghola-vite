@@ -1,7 +1,7 @@
 // netlify/functions/characterSD.js
 const Replicate = require("replicate");
 const Airtable = require("airtable");
-const Loops = require("loops");
+// const Loops = require("loops");
 
 // Common CORS headers
 const CORS_HEADERS = {
