@@ -171,8 +171,8 @@ exports.handler = async (event) => {
 
   let modelVersion, finalPrompt = prompt;
   if (premium) {
-    // modelVersion = "black-forest-labs/flux-1.1-pro";
-    modelVersion = "black-forest-labs/flux-schnell";
+    modelVersion = "black-forest-labs/flux-1.1-pro";
+    // modelVersion = "black-forest-labs/flux-schnell";
     finalPrompt = prompt;
   } else {
     modelVersion = "black-forest-labs/flux-schnell";
