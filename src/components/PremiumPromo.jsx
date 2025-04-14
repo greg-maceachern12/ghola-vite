@@ -9,39 +9,35 @@ const PremiumPromo = ({ onGetStarted }) => {
   });
 
   useEffect(() => {
-    // Calculate midnight tonight in EST
-    const calculateMidnightEST = () => {
-      const now = new Date();
-      
-      // Create a new date object for today in local time
-      const today = new Date(now);
-      
-      // Convert to EST (UTC-4)
-      // We don't change the date object, just use the offset for calculations
-      const estOffset = -4 * 60 * 60 * 1000; // EST offset in milliseconds
-      
-      // Calculate midnight tonight in EST
-      // First get the current date in EST
-      const estNow = new Date(now.getTime() + estOffset - now.getTimezoneOffset() * 60 * 1000);
-      
-      // Then set the time to midnight of the next day
-      const midnightEST = new Date(estNow);
-      midnightEST.setDate(estNow.getDate() + 1);
-      midnightEST.setHours(0, 0, 0, 0);
-      
-      // Convert back to local time for comparison with local Date.now()
-      return new Date(midnightEST.getTime() - estOffset + now.getTimezoneOffset() * 60 * 1000);
-    };
+    // Helper function: get the current time in the EST timezone
+    const getCurrentEST = () => new Date(
+      new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+    );
 
-    const midnightEST = calculateMidnightEST();
-    
+    // Calculate promo start (12:00 PM EST) and end (12:00 AM EST) for today in EST
+    const nowEST = getCurrentEST();
+    const promoStartEST = new Date(nowEST);
+    promoStartEST.setHours(12, 0, 0, 0); // 12:00 PM EST
+    const promoEndEST = new Date(nowEST);
+    promoEndEST.setHours(24, 0, 0, 0);   // 12:00 AM EST (midnight)
+
+    // If current time is before promo start OR after promo end, hide promo immediately
+    if (nowEST < promoStartEST || nowEST >= promoEndEST) {
+      onGetStarted();
+      return;
+    }
+
+    // Convert promoEndEST back into local time for the countdown calculation
+    const promoEndLocal = new Date(promoEndEST.toLocaleString());
+
+    // Set up an interval to update the countdown every second
     const timer = setInterval(() => {
-      const now = Date.now();
-      const diff = Math.max(0, midnightEST.getTime() - now);
+      const now = new Date();
+      const diff = Math.max(0, promoEndLocal.getTime() - now.getTime());
 
       if (diff === 0) {
         clearInterval(timer);
-        onGetStarted(); // Hide the promo when timer reaches zero
+        onGetStarted(); // Hide the promo when timer expires
         return;
       }
 
@@ -53,30 +49,6 @@ const PremiumPromo = ({ onGetStarted }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [onGetStarted]);
-
-  // Check if we're already past midnight EST
-  useEffect(() => {
-    const now = new Date();
-    
-    // Create midnight EST
-    const today = new Date(now);
-    const estOffset = -4 * 60 * 60 * 1000; // EST offset in milliseconds
-    
-    // Calculate current time in EST
-    const estNow = new Date(now.getTime() + estOffset - now.getTimezoneOffset() * 60 * 1000);
-    
-    // Calculate midnight tonight in EST
-    const midnightEST = new Date(estNow);
-    midnightEST.setDate(estNow.getDate() + 1);
-    midnightEST.setHours(0, 0, 0, 0);
-    
-    // Convert back to local time for comparison
-    const midnightESTLocal = new Date(midnightEST.getTime() - estOffset + now.getTimezoneOffset() * 60 * 1000);
-    
-    if (now >= midnightESTLocal) {
-      onGetStarted(); // Hide the promo if it's already past midnight EST
-    }
   }, [onGetStarted]);
 
   return (
@@ -103,7 +75,7 @@ const PremiumPromo = ({ onGetStarted }) => {
               <span className="text-yellow-400 font-semibold tracking-wide text-sm">LIMITED TIME OFFER</span>
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">
-              Premium Access Until Midnight!
+              Premium Access For 12 Hours!
             </h3>
             <p className="text-white/80 text-sm">
               Experience unlimited HD generations, all art styles, and premium features.
@@ -115,17 +87,23 @@ const PremiumPromo = ({ onGetStarted }) => {
             {/* Timer */}
             <div className="flex items-center gap-2 bg-black/30 rounded-lg p-2">
               <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-white">{timeLeft.hours.toString().padStart(2, '0')}</span>
+                <span className="text-2xl font-bold text-white">
+                  {timeLeft.hours.toString().padStart(2, '0')}
+                </span>
                 <span className="text-xs text-white/60">hours</span>
               </div>
               <span className="text-xl font-bold text-white/60">:</span>
               <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-white">{timeLeft.minutes.toString().padStart(2, '0')}</span>
+                <span className="text-2xl font-bold text-white">
+                  {timeLeft.minutes.toString().padStart(2, '0')}
+                </span>
                 <span className="text-xs text-white/60">min</span>
               </div>
               <span className="text-xl font-bold text-white/60">:</span>
               <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-white">{timeLeft.seconds.toString().padStart(2, '0')}</span>
+                <span className="text-2xl font-bold text-white">
+                  {timeLeft.seconds.toString().padStart(2, '0')}
+                </span>
                 <span className="text-xs text-white/60">sec</span>
               </div>
             </div>
