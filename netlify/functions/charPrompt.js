@@ -127,7 +127,7 @@ Output *only* the final prompt, ready for an image generation model.`;
 
     // Call OpenAI API
     const chatResponse = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4.1-mini",
       messages: [
         {
           role: "system",
