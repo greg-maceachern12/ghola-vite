@@ -198,7 +198,7 @@ exports.handler = async (event) => {
     const output = await replicate.run(modelVersion, { input });
     console.log(output)
     const imageUrl = output[0];
-
+    console.log(imageUrl);
     if (output && output.length > 0) {
       await saveToAirtable({ character, prompt, premium, aspect_ratio, style, imageUrl, email });
       await sendToLoops(email, premium);
