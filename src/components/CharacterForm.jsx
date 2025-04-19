@@ -135,16 +135,14 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
       setStyle(newStyle.toLowerCase());
       setShowStyleMenu(false);
     } else {
-      setShowPremiumTooltip(true);
-      setTimeout(() => setShowPremiumTooltip(false), 3000);
+      window.open('https://polar.sh/checkout/polar_c_bQX38ppA7Yuygjci5VWt0s3hUEtqHBt4s0QNb3O4uSt', '_blank');
     }
   };
 
   const handleExampleClick = (example) => {
     // Only allow clicking if the user has premium or if the style is realistic
     if (!premium && example.style !== "realistic") {
-      setShowPremiumTooltip(true);
-      setTimeout(() => setShowPremiumTooltip(false), 3000);
+      window.open('https://polar.sh/checkout/polar_c_bQX38ppA7Yuygjci5VWt0s3hUEtqHBt4s0QNb3O4uSt', '_blank');
       return;
     }
 
