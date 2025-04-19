@@ -87,7 +87,7 @@ const PremiumUpsell = ({
             </div>
 
             <div className="mb-6">
-              <span className="text-white text-3xl font-bold">$2.99</span>
+              <span className="text-white text-3xl font-bold">$4.99</span>
               <span className="text-white/70">/month</span>
             </div>
 
