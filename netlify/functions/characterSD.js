@@ -1,4 +1,5 @@
 // netlify/functions/characterSD.js
+const { OpenAI } = require("openai");
 const Replicate = require("replicate");
 const Airtable = require("airtable");
 // const Loops = require("loops");
@@ -23,74 +24,6 @@ const sendResponse = (statusCode, body) => ({
   headers: { "Content-Type": "application/json", ...CORS_HEADERS },
 });
 
-// Function to send email to Loops.so
-const sendToLoops = async (email, premium) => {
-  if (!email || email === "not-entered") return false;
-
-  const LOOPS_API_KEY = process.env.LOOPS_API_KEY;
-  if (!LOOPS_API_KEY) {
-    console.error("Loops API key not configured");
-    return false;
-  }
-
-  try {
-    // First try to find if contact exists
-    const findResponse = await fetch(`https://app.loops.so/api/v1/contacts/find?email=${encodeURIComponent(email)}`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${LOOPS_API_KEY}`,
-        "Content-Type": "application/json"
-      }
-    });
-
-    const contactData = {
-      email,
-      userGroup: "Ghola Users",
-      source: "Ghola Web App Signup",
-      subscribed: "yes",
-      premium: premium
-    };
-
-    if (findResponse.status === 200) {
-      // Contact exists, update it
-      const updateResponse = await fetch("https://app.loops.so/api/v1/contacts/update", {
-        method: "PUT",
-        headers: {
-          "Authorization": `Bearer ${LOOPS_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(contactData)
-      });
-
-      if (!updateResponse.ok) {
-        const error = await updateResponse.json();
-        throw new Error(error.message || "Failed to update contact in Loops.so");
-      }
-    } else {
-      // Contact doesn't exist, create it
-      const createResponse = await fetch("https://app.loops.so/api/v1/contacts/create", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${LOOPS_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(contactData)
-      });
-
-      if (!createResponse.ok) {
-        const error = await createResponse.json();
-        throw new Error(error.message || "Failed to create contact in Loops.so");
-      }
-    }
-
-    console.log("Successfully synced contact with Loops.so");
-    return true;
-  } catch (error) {
-    console.error("Error sending to Loops.so:", error);
-    return false;
-  }
-};
-
 // Function to save generation data to Airtable
 const saveToAirtable = async (data) => {
   const { character, prompt, premium, aspect_ratio, style, imageUrl, email } = data;
@@ -111,6 +44,12 @@ const saveToAirtable = async (data) => {
     const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(
       AIRTABLE_BASE_ID
     );
+
+    // For base64 images, we'll store just a reference since the data is too large
+    const imageUrlForAirtable = imageUrl.startsWith('data:image') 
+      ? 'base64_image_generated' 
+      : imageUrl;
+
     // Create a new record in Airtable
     return new Promise((resolve, reject) => {
       base(AIRTABLE_TABLE_NAME).create(
@@ -123,10 +62,11 @@ const saveToAirtable = async (data) => {
               Premium: premium ? "Yes" : "No",
               "Aspect Ratio": aspect_ratio || "landscape",
               Style: style || "Realistic",
-              "Image URL": imageUrl || "",
+              "Image URL": imageUrlForAirtable,
               "Created At": new Date().toISOString(),
               Source: "Ghola Web App",
-              attach: imageUrl ? [{ url: imageUrl }] : [] // Add the image URL as an attachment
+              // Only add attachment if it's a URL, not base64
+              attach: !imageUrl.startsWith('data:image') ? [{ url: imageUrl }] : []
             },
           },
         ],
@@ -165,45 +105,76 @@ exports.handler = async (event) => {
   const { prompt, premium, aspect_ratio = "landscape", style = "Realistic", character, email } = requestBody;
   if (!prompt) return sendResponse(400, { error: "Please provide a prompt in the request body" });
 
-  // Map aspect ratio to values
-  const aspectMap = { square: "1:1", portrait: "2:3", landscape: "3:2" };
-  const aspectRatioValue = aspectMap[aspect_ratio] || "3:2";
-
-  let modelVersion, finalPrompt = prompt;
-  if (premium) {
-    modelVersion = "black-forest-labs/flux-1.1-pro";
-    // modelVersion = "black-forest-labs/flux-schnell";
-    finalPrompt = prompt;
-  } else {
-    modelVersion = "black-forest-labs/flux-schnell";
+  let finalPrompt = prompt;
+  if (style && style !== "realistic") {
+    finalPrompt = `${prompt}, in the style of ${style}`;
   }
 
-  console.log("Using model:", modelVersion);
   console.log("Final prompt:", finalPrompt);
 
-  const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
-  const input = {
-    prompt: finalPrompt,
-    num_outputs: 1,
-    aspect_ratio: aspectRatioValue,
-    output_format: "jpg",
-    output_quality: 100,
-    seed: 17329,
-    safety_tolerance: 6,
-    prompt_upsampling: true,
-    disable_safety_checker: true,
-  };
-
   try {
-    const output = await replicate.run(modelVersion, { input });
-    console.log(output)
-    const imageUrl = Array.isArray(output) ? output[0] : output;
-    console.log(imageUrl);
-    if (output && output.length > 0) {
-      await saveToAirtable({ character, prompt, premium, aspect_ratio, style, imageUrl, email });
-      await sendToLoops(email, premium);
+    let imageUrl;
+
+    if (premium) {
+      // Use DALL-E for premium users
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+
+      // Map aspect ratio to DALL-E size
+      const sizeMap = {
+        square: "1024x1024",
+        portrait: " 1024x1536",
+        landscape: "1536x1024"
+      };
+      const size = sizeMap[aspect_ratio] || "1024x1024";
+
+      const response = await openai.images.generate({
+        model: "gpt-image-1",
+        prompt: finalPrompt,
+        n: 1,
+        size: size,
+        quality: "low",
+        moderation: "low"
+      });
+
+      // Convert base64 to data URL
+      console.log(response)
+      const base64Image = response.data[0].b64_json;
+      imageUrl = `data:image/jpeg;base64,${base64Image}`;
+      
+    } else {
+      // Use Flux-schnell for non-premium users
+      const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
+      
+      // Map aspect ratio to values for Flux
+      const aspectMap = { square: "1:1", portrait: "2:3", landscape: "3:2" };
+      const aspectRatioValue = aspectMap[aspect_ratio] || "3:2";
+
+      const input = {
+        prompt: finalPrompt,
+        num_outputs: 1,
+        aspect_ratio: aspectRatioValue,
+        output_format: "jpg",
+        output_quality: 100,
+        seed: 17329,
+        safety_tolerance: 6,
+        prompt_upsampling: true,
+        disable_safety_checker: true,
+      };
+
+      const output = await replicate.run("black-forest-labs/flux-schnell", { input });
+      imageUrl = Array.isArray(output) ? output[0] : output;
     }
-    return sendResponse(200, { result: output });
+
+    console.log("Image URL generated");
+    
+    if (imageUrl) {
+      await saveToAirtable({ character, prompt, premium, aspect_ratio, style, imageUrl, email });
+      // await sendToLoops(email, premium);
+    }
+    
+    return sendResponse(200, { result: [imageUrl] });
   } catch (error) {
     console.error("Error generating image:", error);
     return sendResponse(500, { error: "An error occurred while processing the request", details: error.message });

@@ -4,40 +4,86 @@ import { FaDownload, FaShare, FaInfoCircle, FaCrown } from "react-icons/fa";
 const GeneratedImage = ({ src, alt, character, premium, loading }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [blobUrl, setBlobUrl] = useState(null);
 
   useEffect(() => {
     // Reset loading state when src changes
     if (src) {
       setIsLoaded(false);
+      // Handle array of URLs (from API response)
+      const imageUrl = Array.isArray(src) ? src[0] : src;
+      
+      // Check if it's a base64 image (premium)
+      if (typeof imageUrl === 'string' && imageUrl.startsWith('data:image')) {
+        // Convert base64 to blob URL
+        fetch(imageUrl)
+          .then(res => res.blob())
+          .then(blob => {
+            const url = URL.createObjectURL(blob);
+            setBlobUrl(url);
+          });
+      } else {
+        setBlobUrl(imageUrl);
+      }
     }
+    // Cleanup function to revoke blob URL
+    return () => {
+      if (blobUrl && typeof blobUrl === 'string' && blobUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
   }, [src]);
 
   const handleDownload = () => {
-    // Create a temporary link
-    const link = document.createElement("a");
-    link.href = src;
+    if (!src) return;
+    
+    const imageUrl = Array.isArray(src) ? src[0] : src;
+    
+    // For base64 images (premium)
+    if (typeof imageUrl === 'string' && imageUrl.startsWith('data:image')) {
+      const link = document.createElement("a");
+      link.href = imageUrl;
+      link.download = character
+        ? `ghola-${character.toLowerCase().replace(/[^a-z0-9]/g, "-")}.jpg`
+        : "ghola-character.jpg";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
 
-    // Clean up character name for filename
-    const filename = character
-      ? `ghola-${character.toLowerCase().replace(/[^a-z0-9]/g, "-")}.jpg`
-      : "ghola-character.jpg";
-
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // For regular URLs (non-premium)
+    fetch(imageUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = character
+          ? `ghola-${character.toLowerCase().replace(/[^a-z0-9]/g, "-")}.jpg`
+          : "ghola-character.jpg";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      });
   };
 
   const handleShare = async () => {
-    if (!navigator.share) {
+    if (!navigator.share || !src) {
       setShowTooltip(true);
       setTimeout(() => setShowTooltip(false), 2000);
       return;
     }
 
     try {
-      // Fetch the image and convert to blob
-      const response = await fetch(src);
+      const imageUrl = Array.isArray(src) ? src[0] : src;
+      // For both base64 and URL images, fetch and convert to blob
+      const response = await fetch(
+        typeof imageUrl === 'string' && imageUrl.startsWith('data:image') 
+          ? imageUrl 
+          : blobUrl
+      );
       const blob = await response.blob();
       const file = new File([blob], "character.jpg", { type: "image/jpeg" });
 
@@ -68,16 +114,16 @@ const GeneratedImage = ({ src, alt, character, premium, loading }) => {
         ) : (
           <>
             {/* Image loading indicator (only when image is loading after generation) */}
-            {src && !isLoaded && (
+            {blobUrl && !isLoaded && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/5">
                 <div className="w-8 h-8 border-2 border-white/30 border-t-white/80 rounded-full animate-spin"></div>
               </div>
             )}
 
             {/* The image */}
-            {src && (
+            {blobUrl && (
               <img
-                src={src}
+                src={blobUrl}
                 alt={alt}
                 className={`w-full h-auto rounded-xl object-cover max-h-[600px] transition-all duration-500 ${
                   isLoaded ? "opacity-100" : "opacity-30"
@@ -88,7 +134,7 @@ const GeneratedImage = ({ src, alt, character, premium, loading }) => {
             )}
 
             {/* Placeholder when no image */}
-            {!src && (
+            {!blobUrl && (
               <div className="w-full h-[400px] bg-white/5 flex items-center justify-center">
                 <div className="text-white/40 text-center">
                   <svg
@@ -124,7 +170,7 @@ const GeneratedImage = ({ src, alt, character, premium, loading }) => {
       </div>
 
       {/* Action buttons - only show when image is loaded and not loading */}
-      {src && isLoaded && !loading && (
+      {blobUrl && isLoaded && !loading && (
         <div className="flex justify-between items-center mt-4">
           <div className="text-xs text-white/50 flex items-center gap-1">
             <FaInfoCircle />

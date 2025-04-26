@@ -113,6 +113,10 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!premium) {
+      window.open('https://buy.polar.sh/polar_cl_ukvMp9Z1bIr9IrqDv9Y0Zs80WtqXf9gFLLkUH1Gd0B3', '_blank');
+      return;
+    }
     onSubmit(prompt.trim(), aspectRatio, style.toLowerCase());
   };
 

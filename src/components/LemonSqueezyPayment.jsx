@@ -8,6 +8,83 @@ import {
 } from "lucide-react";
 import { Polar } from "@polar-sh/sdk";
 
+// Function to send email to Loops.so
+const sendToLoops = async (email, premium) => {
+  if (!email || email === "not-entered") return false;
+
+  const LOOPS_API_KEY = import.meta.env.VITE_LOOPS_API_KEY;
+  if (!LOOPS_API_KEY) {
+    console.error("Loops API key (VITE_LOOPS_API_KEY) not configured in .env");
+    return false;
+  }
+
+  try {
+    // First try to find if contact exists
+    const findResponse = await fetch(`https://app.loops.so/api/v1/contacts/find?email=${encodeURIComponent(email)}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${LOOPS_API_KEY}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    const contactData = {
+      email,
+      userGroup: "Ghola Users",
+      source: "Ghola Web App Signup",
+      subscribed: "yes",
+      premium: premium ? "Yes" : "No" // Send premium status as Yes/No string
+    };
+
+    let syncSuccess = false;
+    if (findResponse.ok) { // Check status code 200 for existence
+      // Contact exists, update it
+      const updateResponse = await fetch("https://app.loops.so/api/v1/contacts/update", {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${LOOPS_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(contactData)
+      });
+
+      if (!updateResponse.ok) {
+        const error = await updateResponse.json();
+        throw new Error(error.message || "Failed to update contact in Loops.so");
+      }
+      syncSuccess = true;
+    } else if (findResponse.status === 404) {
+      // Contact doesn't exist, create it
+      const createResponse = await fetch("https://app.loops.so/api/v1/contacts/create", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${LOOPS_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(contactData)
+      });
+
+      if (!createResponse.ok) {
+        const error = await createResponse.json();
+        throw new Error(error.message || "Failed to create contact in Loops.so");
+      }
+      syncSuccess = true;
+    } else {
+      // Handle other potential errors from the find request
+      const error = await findResponse.json();
+      throw new Error(error.message || `Failed to find contact in Loops.so: Status ${findResponse.status}`);
+    }
+
+    if (syncSuccess) {
+      console.log("Successfully synced contact with Loops.so");
+    }
+    return syncSuccess;
+  } catch (error) {
+    console.error("Error sending to Loops.so:", error);
+    return false;
+  }
+};
+
 const PremiumAccessManager = ({ onValidationSuccess, onStatusCheck }) => {
   // State management
   const [email, setEmail] = useState("");
@@ -39,18 +116,20 @@ const PremiumAccessManager = ({ onValidationSuccess, onStatusCheck }) => {
 
   // Function to check subscription status
   const checkSubscription = async (emailToCheck) => {
+    let isSubscribed = false; // Local variable to track status within this check
     try {
       const response = await polar.subscriptions.list({
         product_id: PRODUCT_ID
       });
 
       const subscriptions = response?.result?.items || [];
-      const activeSubscription = subscriptions.find(sub => 
-        (sub.status === "active" || sub.status === "trialing") && 
+      const activeSubscription = subscriptions.find(sub =>
+        (sub.status === "active" || sub.status === "trialing") &&
         (sub.productId === PRODUCT_ID && sub.customer.email === emailToCheck)
       );
 
       if (activeSubscription) {
+        isSubscribed = true;
         setIsPremium(true);
         setIsVisible(false);
         onStatusCheck?.({ email: emailToCheck, isPremium: true });
@@ -62,15 +141,27 @@ const PremiumAccessManager = ({ onValidationSuccess, onStatusCheck }) => {
           });
         }
       } else {
+        isSubscribed = false;
         setIsPremium(false);
-        setIsVisible(false);
+        // Keep modal visible if they entered email but are not premium
+        // setIsVisible(false);
+        setIsVisible(false); // Keep visible or maybe show a message? Let's keep it visible for now.
         onStatusCheck?.({ email: emailToCheck, isPremium: false });
+        // Add a message to prompt upgrade?
+        // setMessage("Looks like you don't have premium access yet. Upgrade below!"); // Example message
+        setError(null); // Clear previous errors
       }
     } catch (error) {
       console.error("Error checking subscription:", error);
+      isSubscribed = false;
       setIsPremium(false);
       setIsVisible(true);
       onStatusCheck?.({ email: emailToCheck, isPremium: false });
+      setError("Could not verify subscription. Please try again or contact support."); // More specific error
+      setMessage(null); // Clear previous messages
+    } finally {
+      // Send to Loops regardless of check success/failure, but *after* status is determined
+      await sendToLoops(emailToCheck, isSubscribed);
     }
   };
 
