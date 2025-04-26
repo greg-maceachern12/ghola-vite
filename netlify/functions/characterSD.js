@@ -1,5 +1,4 @@
 // netlify/functions/characterSD.js
-const { OpenAI } = require("openai");
 const Replicate = require("replicate");
 const Airtable = require("airtable");
 // const Loops = require("loops");
@@ -115,55 +114,50 @@ exports.handler = async (event) => {
   try {
     let imageUrl;
 
+    // Configure Replicate client
+    const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
+    
+    // Map aspect ratio to values for Flux
+    const aspectMap = { square: "1:1", portrait: "2:3", landscape: "3:2" };
+    const aspectRatioValue = aspectMap[aspect_ratio] || "3:2";
+
+    // Base configuration for both premium and non-premium
+    const baseConfig = {
+      prompt: finalPrompt,
+      num_outputs: 1,
+      aspect_ratio: aspectRatioValue,
+      output_format: "jpg",
+      output_quality: 100,
+      seed: 17329,
+      prompt_upsampling: true,
+      disable_safety_checker: true,
+    };
+
     if (premium) {
-      // Use DALL-E for premium users
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      // Map aspect ratio to DALL-E size
-      const sizeMap = {
-        square: "1024x1024",
-        portrait: " 1024x1536",
-        landscape: "1536x1024"
-      };
-      const size = sizeMap[aspect_ratio] || "1024x1024";
-
-      const response = await openai.images.generate({
-        model: "gpt-image-1",
-        prompt: finalPrompt,
-        n: 1,
-        size: size,
-        quality: "low",
-        moderation: "low"
-      });
-
-      // Convert base64 to data URL
-      console.log(response)
-      const base64Image = response.data[0].b64_json;
-      imageUrl = `data:image/jpeg;base64,${base64Image}`;
-      
-    } else {
-      // Use Flux-schnell for non-premium users
-      const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
-      
-      // Map aspect ratio to values for Flux
-      const aspectMap = { square: "1:1", portrait: "2:3", landscape: "3:2" };
-      const aspectRatioValue = aspectMap[aspect_ratio] || "3:2";
-
+      // Use Flux Pro for premium users with higher quality settings
+      // const input = {
+      //   ...baseConfig,
+      //   model_version: "pro",
+      //   quality_preset: "high",
+      //   guidance_scale: 7.5,
+      //   negative_prompt: "ugly, deformed, noisy, blurry, low quality, anime, cartoon, drawing, illustration, boring, bad art"
+      // };
       const input = {
-        prompt: finalPrompt,
-        num_outputs: 1,
+        prompt: prompt,
+        openai_api_key: process.env.OPENAI_API_KEY,
+        quality: "medium",
+        moderation: "low",
         aspect_ratio: aspectRatioValue,
-        output_format: "jpg",
-        output_quality: 100,
-        seed: 17329,
-        safety_tolerance: 6,
-        prompt_upsampling: true,
-        disable_safety_checker: true,
+        output_format: "webp",
+        number_of_images: 1,
+        output_compression: 90
       };
 
-      const output = await replicate.run("black-forest-labs/flux-schnell", { input });
+      const output = await replicate.run("openai/gpt-image-1", { input });
+      imageUrl = Array.isArray(output) ? output[0] : output;
+    } else {
+      // Use standard Flux for non-premium users
+      const output = await replicate.run("black-forest-labs/flux-schnell", { input: baseConfig });
       imageUrl = Array.isArray(output) ? output[0] : output;
     }
 
@@ -177,6 +171,6 @@ exports.handler = async (event) => {
     return sendResponse(200, { result: [imageUrl] });
   } catch (error) {
     console.error("Error generating image:", error);
-    return sendResponse(500, { error: "An error occurred while processing the request", details: error.message });
+    // return sendResponse(500, { error: "An error occurred while processing the request", details: error.message });
   }
 };

@@ -447,7 +447,7 @@ const Hero = () => {
                 </div>
                 <p className="text-blue-100 text-xs">
                   <span className="font-medium">Upgrade to Premium</span>
-                  <span className="hidden sm:inline"> - Unlimited HD generations</span>
+                  <span className="hidden sm:inline"> - Unlimited HD generations <strong>Now with the new OpenAI Image Model</strong></span>
                 </p>
               </div>
               <button 
