@@ -77,11 +77,17 @@ exports.handler = async function (event, context) {
       case "ghibli":
         styleGuidance = "Emphasize a hand-drawn, painted look reminiscent of Hayao Miyazaki. Use terms like 'watercolor textures', 'soft outlines', 'lush natural backgrounds', 'expressive, slightly rounded features', 'gentle lighting', 'whimsical atmosphere'.";
         break;
-      case "nintendo":
+      case "fortnite":
         styleGuidance = "Focus on bright, saturated, primary colors. Use terms like 'cel-shaded', 'bold outlines', 'clean vector art style', 'appealing character design', 'simplified shapes', 'game art'.";
         break;
       case "lego":
         styleGuidance = "Describe the character *as* a Lego minifigure. Use terms like 'plastic sheen', 'cylindrical head', 'blocky torso', 'claw hands', 'printed facial expression', 'studs', 'modular bricks'.";
+        break;
+      case "animal crossing":
+        styleGuidance = "Describe the character using the distinctive Animal Crossing style. Use terms like 'cartoonish', 'simple geometric shapes', 'flat colors', 'bold black outlines', 'minimalist features', 'crude animation style'.";
+        break;
+      case "minecraft":
+        styleGuidance = "Describe the character using the distinctive Minecraft style. Use terms like 'blocky', 'simple geometric shapes', 'flat colors', 'bold black outlines', 'minimalist features', 'crude animation style'.";
         break;
       case "southpark":
         styleGuidance = "Describe the character using the distinctive South Park cutout animation style. Use terms like 'construction paper texture', 'simple geometric shapes', 'flat colors', 'bold black outlines', 'minimalist features', 'crude animation style'.";

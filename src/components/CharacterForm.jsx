@@ -391,15 +391,15 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                   <li>
                     <button
                       type="button"
-                      onClick={() => handleStyleSelect("nintendo")}
+                      onClick={() => handleStyleSelect("fortnite")}
                       className={`block w-full text-left px-4 py-2 text-sm ${
-                        style === "nintendo"
+                        style === "fortnite"
                           ? "bg-blue-500/20 text-blue-400"
                           : "hover:bg-white/5"
                       } ${!premium && "opacity-70"}`}
                     >
                       <div className="flex items-center justify-between">
-                        <span>Nintendo</span>
+                        <span>Fortnite</span>
                         {!premium && (
                           <FaLock className="text-white/60 text-xs" />
                         )}
@@ -436,6 +436,42 @@ const CharacterForm = ({ onSubmit, loading, premium }) => {
                     >
                       <div className="flex items-center justify-between">
                         <span>South Park</span>
+                        {!premium && (
+                          <FaLock className="text-white/60 text-xs" />
+                        )}
+                      </div>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => handleStyleSelect("animal crossing")}
+                      className={`block w-full text-left px-4 py-2 text-sm ${
+                        style === "animal crossing"
+                          ? "bg-blue-500/20 text-blue-400"
+                          : "hover:bg-white/5"
+                      } ${!premium && "opacity-70"}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>Animal Crossing</span>
+                        {!premium && (
+                          <FaLock className="text-white/60 text-xs" />
+                        )}
+                      </div>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => handleStyleSelect("minecraft")}
+                      className={`block w-full text-left px-4 py-2 text-sm ${
+                        style === "minecraft"
+                          ? "bg-blue-500/20 text-blue-400"
+                          : "hover:bg-white/5"
+                      } ${!premium && "opacity-70"}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>Minecraft</span>
                         {!premium && (
                           <FaLock className="text-white/60 text-xs" />
                         )}
