@@ -14,7 +14,7 @@ const WelcomeDialog = ({ onClose }) => {
           <h2 className="text-2xl font-bold mb-2">Introducing Baselift</h2>
           <p className="text-gray-600 mb-6">AI-powered workouts designed specifically for your goals, fitness level, and schedule.</p>
           <a
-            href="https://baselift.io"
+            href="https://go.baselift.io"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg"
